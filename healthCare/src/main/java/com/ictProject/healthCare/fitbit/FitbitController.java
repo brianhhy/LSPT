@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -31,7 +30,6 @@ public class FitbitController {
     private final String tokenUri;
     private final String redirectUri;
 
-    // 생성자를 통해 필요한 값들을 주입받습니다.
     public FitbitController(WebClient.Builder webClientBuilder,
                             @Value("${fitbit.client-id}") String clientId,
                             @Value("${fitbit.client-secret}") String clientSecret,
@@ -44,98 +42,6 @@ public class FitbitController {
         this.redirectUri = redirectUri;
     }
 
-    // Fitbit API에서 데이터를 가져와서 모델에 추가하는 메서드입니다.
-    @GetMapping("/start")
-    public String start(@RequestParam("access_token") String accessToken, Model model) {
-        // 여러 Fitbit API 호출을 비동기로 수행합니다.
-        Mono<String> activities = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> heartrate = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        // 추가적인 API 호출
-        Mono<String> location = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities/location.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> nutrition = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/foods/log/date/today.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> oxygenSaturation = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/spo2/date/today.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> profile = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/profile.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> respiratoryRate = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/respiratory_rate/date/today/1d.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> settings = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/settings.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> sleep = webClient.get()
-                .uri("https://api.fitbit.com/1.2/user/-/sleep/date/today.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> social = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/friends.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> temperature = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/body/temperature.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-        Mono<String> weight = webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/body/log/weight/date/today.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-
-
-        // 결과를 모델에 추가하고 반환합니다.
-        return Mono.zip(activities, heartrate,location,nutrition,oxygenSaturation)
-                .map(tuple -> {
-                    model.addAttribute("activities", tuple.getT1());
-                    model.addAttribute("heartrate", tuple.getT2());
-                    model.addAttribute("location", tuple.getT3());
-                    model.addAttribute("nutrition", tuple.getT4());
-                    model.addAttribute("oxygenSaturation",tuple.getT5());
-                    return "start";
-                })
-                .block();
-    }
-
-    // Fitbit로부터 콜백을 처리하고 토큰을 교환하는 메서드입니다.
     @GetMapping("/callback")
     public String callback(@RequestParam("code") String code, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         HttpSession session = request.getSession();
@@ -162,8 +68,8 @@ public class FitbitController {
             }
 
             String accessToken = (String) response.get("access_token");
-            redirectAttributes.addAttribute("access_token", accessToken);
-            return "redirect:/start";
+            session.setAttribute("access_token", accessToken);
+            return "redirect:/api/profile";
         } catch (WebClientResponseException e) {
             redirectAttributes.addFlashAttribute("error", "Error during token request: " + e.getResponseBodyAsString());
             return "redirect:/error";
@@ -173,7 +79,6 @@ public class FitbitController {
         }
     }
 
-    // 토큰 요청을 위한 폼 데이터를 생성하는 메서드입니다.
     private MultiValueMap<String, String> buildTokenRequest(String code, String codeVerifier) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(OAuth2ParameterNames.CLIENT_ID, clientId);
@@ -185,14 +90,20 @@ public class FitbitController {
         return formData;
     }
 
-    // 사용자 인증을 시작하는 엔드포인트입니다.
     @GetMapping("/authorize")
     public String authorize(HttpServletRequest request) throws NoSuchAlgorithmException {
         String codeVerifier = PKCEUtil.generateCodeVerifier();
         String codeChallenge = PKCEUtil.generateCodeChallenge(codeVerifier);
 
         HttpSession session = request.getSession();
+        String accessToken = (String) session.getAttribute("access_token");
+        // 이미 엑세스 토큰이 있는 경우 리다이렉트 방지
+        if (accessToken != null) {
+            return "redirect:/api/profile";
+        }
         session.setAttribute("code_verifier", codeVerifier);
+
+
 
         String authorizationRequestUri = UriComponentsBuilder.fromUriString("https://www.fitbit.com/oauth2/authorize")
                 .queryParam("response_type", "code")
@@ -206,7 +117,6 @@ public class FitbitController {
         return "redirect:" + authorizationRequestUri;
     }
 
-    // 에러 페이지를 처리하는 엔드포인트입니다.
     @GetMapping("/error")
     public String error(Model model) {
         return "error";

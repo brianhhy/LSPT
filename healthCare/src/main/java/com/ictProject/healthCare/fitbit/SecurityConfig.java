@@ -33,12 +33,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/", "/start", "/callback", "/authorize").permitAll()
+                                .requestMatchers("/", "/api/**", "/callback", "/authorize").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .defaultSuccessUrl("/start", true)
+                                .defaultSuccessUrl("/api/profile", true)
                 )
                 .logout(logout ->
                         logout
