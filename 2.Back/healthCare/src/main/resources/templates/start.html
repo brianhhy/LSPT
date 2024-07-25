@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitbit Data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Fitbit Data</h1>
+
+    <!-- Activities Data -->
+    <h2>Activities</h2>
+    <pre th:text="${activities}"></pre>
+
+    <!-- Heartrate Data -->
+    <h2>Heartrate</h2>
+    <pre th:text="${heartrate}"></pre>
+
+    <!-- Location Data -->
+    <h2>Location</h2>
+    <pre th:text="${location}"></pre>
+
+    <!-- Nutrition Data -->
+    <h2>Nutrition</h2>
+    <pre th:text="${nutrition}"></pre>
+
+    <!-- Oxygen Saturation Data -->
+    <h2>Oxygen Saturation</h2>
+    <pre th:text="${oxygenSaturation}"></pre>
+
+    <!-- Profile Data -->
+    <h2>Profile</h2>
+    <pre th:text="${profile}"></pre>
+
+    <!-- Respiratory Rate Data -->
+    <h2>Respiratory Rate</h2>
+    <pre th:text="${respiratoryRate}"></pre>
+
+    <!-- Settings Data -->
+    <h2>Settings</h2>
+    <pre th:text="${settings}"></pre>
+
+    <!-- Sleep Data -->
+    <h2>Sleep</h2>
+    <pre th:text="${sleep}"></pre>
+
+    <!-- Social Data -->
+    <h2>Social</h2>
+    <pre th:text="${social}"></pre>
+
+    <!-- Temperature Data -->
+    <h2>Temperature</h2>
+    <pre th:text="${temperature}"></pre>
+
+    <!-- Weight Data -->
+    <h2>Weight</h2>
+    <pre th:text="${weight}"></pre>
+</div>
+</body>
+</html>
