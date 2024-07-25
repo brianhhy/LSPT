@@ -1,0 +1,45 @@
+First upload of application
+Fitbit api 1st Implementation
+
+API Description
+------------------------------------------------------
+ 
+Get("/api/activities")
+  -사용자의 활동량
+
+Get("/api/heartrate")
+  -사용자의 심박수     
+
+Get("/api/location")
+  -사용자 위치
+    
+Get("/api/nutrition")
+  -사용자 영양
+    
+Get("/api/oxygen_saturation")
+  -사용자 산소 포화도
+
+Get("/api/profile")
+  -사용자 프로필
+
+Get("/api/respiratory_rate")
+  -사용자 호흡
+
+Get("/api/settings")
+  -세팅
+   
+Get("/api/sleep")
+  -사용자 수면
+
+Get("/api/social")
+  -소셜, 커뮤니티
+
+Get("/api/temperature")
+  -체온
+
+Get("/api/weight")
+  -사용자 무게
+
+---------------------------------------------------------
+json 포멧 및 세부사항은 추가 업로드하겠습니다.
+   
