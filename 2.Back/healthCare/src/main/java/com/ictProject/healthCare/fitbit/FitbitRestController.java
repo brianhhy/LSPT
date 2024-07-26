@@ -41,7 +41,7 @@ public class FitbitRestController {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d.json")
+                .uri("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec.json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
