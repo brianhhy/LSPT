@@ -20,42 +20,44 @@ public class FitbitRestController {
         this.webClient = webClientBuilder.build();
     }
 
+    // 사용자의 날짜별 활동 요약 가져오기
     @GetMapping("/api/activities")
-    public Mono<String> getActivities(HttpSession session) {
+    public Mono<String> getActivities(@RequestParam("date") String date, HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
-        System.out.println("엑세스토근"+accessToken);
+        System.out.println("엑세스토큰: " + accessToken);
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities.json")
+                .uri("https://api.fitbit.com/1/user/-/activities/date/" + date + ".json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
     }
 
-    @GetMapping("/api/heartrate")
-    public Mono<String> getHeartrate(HttpSession session) {
+    // 날짜별 심박수 시계열 가져오기
+    @GetMapping("/api/heartrate/time")
+    public Mono<String> getHeartrateTime(@RequestParam("date") String date, HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec.json")
+                .uri("https://api.fitbit.com/1/user/-/activities/heart/date/" + date + "/1d/1sec.json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
     }
 
-    // 다른 API 엔드포인트들도 비슷하게 구현
-    @GetMapping("/api/location")
-    public Mono<String> getLocation(HttpSession session) {
+    // 날짜별 심박수 변화도 가져오기
+    @GetMapping("/api/heartrate/variability")
+    public Mono<String> getHeartrateVariability(@RequestParam("date") String date, HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/activities/location.json")
+                .uri("https://api.fitbit.com/1/user/-/hrv/date/" + date + ".json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
@@ -70,14 +72,87 @@ public class FitbitRestController {
                 .bodyToMono(String.class);
     }
 
+    // 날짜별 산소포화도 가져오기
     @GetMapping("/api/oxygen_saturation")
-    public Mono<String> getOxygenSaturation(HttpSession session) {
+    public Mono<String> getOxygenSaturation(@RequestParam("date") String date, HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/spo2/date/today.json")
+                .uri("https://api.fitbit.com/1/user/-/spo2/date/" + date + ".json")
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    // 날짜별 호흡율 가져오기
+    @GetMapping("/api/breathing_rate")
+    public Mono<String> getRespiratoryRate(@RequestParam("date") String date, HttpSession session) {
+        String accessToken = (String) session.getAttribute("access_token");
+        if (accessToken == null) {
+            return Mono.just("Access token is missing.");
+        }
+        return webClient.get()
+                .uri("https://api.fitbit.com/1/user/-/br/date/" + date + ".json")
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    // 날짜별 수면 기록 가져오기
+    @GetMapping("/api/sleep")
+    public Mono<String> getSleep(@RequestParam("date") String date, HttpSession session) {
+        String accessToken = (String) session.getAttribute("access_token");
+        if (accessToken == null) {
+            return Mono.just("Access token is missing.");
+        }
+        return webClient.get()
+                .uri("https://api.fitbit.com/1.2/user/-/sleep/date/" + date + ".json")
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    // 날짜별 코어 온도 가져오기
+    @GetMapping("/api/temperature/core")
+    public Mono<String> getTemperatureCore(@RequestParam("date") String date, HttpSession session) {
+        String accessToken = (String) session.getAttribute("access_token");
+        if (accessToken == null) {
+            return Mono.just("Access token is missing.");
+        }
+        return webClient.get()
+                .uri("https://api.fitbit.com/1/user/-/temp/core/date/" + date + ".json")
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    // 날짜별 피부 온도 가져오기
+    @GetMapping("/api/temperature/skin")
+    public Mono<String> getTemperatureSkin(@RequestParam("date") String date, HttpSession session) {
+        String accessToken = (String) session.getAttribute("access_token");
+        if (accessToken == null) {
+            return Mono.just("Access token is missing.");
+        }
+        return webClient.get()
+                .uri("https://api.fitbit.com/1/user/-/temp/skin/date/" + date + ".json")
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+
+
+
+    @GetMapping("/api/weight")
+    public Mono<String> getWeight(HttpSession session) {
+        String accessToken = (String) session.getAttribute("access_token");
+        if (accessToken == null) {
+            return Mono.just("Access token is missing.");
+        }
+        return webClient.get()
+                .uri("https://api.fitbit.com/1/user/-/body/log/weight/date/today.json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
@@ -96,45 +171,7 @@ public class FitbitRestController {
                 .bodyToMono(String.class);
     }
 
-    @GetMapping("/api/respiratory_rate")
-    public Mono<String> getRespiratoryRate(HttpSession session) {
-        String accessToken = (String) session.getAttribute("access_token");
-        if (accessToken == null) {
-            return Mono.just("Access token is missing.");
-        }
-        return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/respiratory_rate/date/today/1d.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-    }
-
-    @GetMapping("/api/settings")
-    public Mono<String> getSettings(HttpSession session) {
-        String accessToken = (String) session.getAttribute("access_token");
-        if (accessToken == null) {
-            return Mono.just("Access token is missing.");
-        }
-        return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/settings.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-    }
-
-    @GetMapping("/api/sleep")
-    public Mono<String> getSleep(HttpSession session) {
-        String accessToken = (String) session.getAttribute("access_token");
-        if (accessToken == null) {
-            return Mono.just("Access token is missing.");
-        }
-        return webClient.get()
-                .uri("https://api.fitbit.com/1.2/user/-/sleep/date/today.json")
-                .headers(headers -> headers.setBearerAuth(accessToken))
-                .retrieve()
-                .bodyToMono(String.class);
-    }
-
+    //친구 리스트 가져오기
     @GetMapping("/api/social")
     public Mono<String> getSocial(HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
@@ -148,27 +185,27 @@ public class FitbitRestController {
                 .bodyToMono(String.class);
     }
 
-    @GetMapping("/api/temperature")
-    public Mono<String> getTemperature(HttpSession session) {
+    @GetMapping("/api/location")
+    public Mono<String> getLocation(HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/body/temperature.json")
+                .uri("https://api.fitbit.com/1/user/-/activities/location.json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
     }
 
-    @GetMapping("/api/weight")
-    public Mono<String> getWeight(HttpSession session) {
+    @GetMapping("/api/settings")
+    public Mono<String> getSettings(HttpSession session) {
         String accessToken = (String) session.getAttribute("access_token");
         if (accessToken == null) {
             return Mono.just("Access token is missing.");
         }
         return webClient.get()
-                .uri("https://api.fitbit.com/1/user/-/body/log/weight/date/today.json")
+                .uri("https://api.fitbit.com/1/user/-/settings.json")
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .bodyToMono(String.class);
