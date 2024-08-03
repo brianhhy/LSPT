@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#root {
+  height: 100%;
+  background: linear-gradient(to right, #fc00ff, #00dbde);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 2s ease-in-out;
+}
+
+h1 {
+  padding: 40px;
+}
+
+.hover-border-parent:hover .hover-border {
+  border-color: #00467F;
+}
