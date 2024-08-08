@@ -129,6 +129,9 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
 }
 
 function PatientInfo({ setShowPatientInfo, setUserType }) {
+  const handleFitbitConnect = () => {
+    window.location.href = 'https://localhost:8443/authorize';
+  };
   return (
     <div className="relative overflow-hidden bg-white py-24 sm:py-32 fade-in">
       <button
@@ -162,6 +165,7 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
                       <button
                         className="rounded-md px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
+                        onClick={handleFitbitConnect}
                       >
                         Fitbit 연동하기
                       </button>
