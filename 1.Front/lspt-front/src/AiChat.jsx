@@ -6,15 +6,16 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageIcon from '@mui/icons-material/ManageAccounts';
 import CalendarIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PublicIcon from '@mui/icons-material/Public'; // PublicIcon 가져오기
 import userImg from './assets/user.png';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AiChatBox from './AiChatBox';
 import AdminChatBox from './AdminChatBox';
 
-
 function AiChat() {
   const location = useLocation();
+  const navigate = useNavigate(); // navigate hook 사용
   const [activeTab, setActiveTab] = useState('AI 상담 서비스'); // Default tab
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -66,6 +67,11 @@ function AiChat() {
       .catch((err) => {
         console.error('클립보드 복사에 실패했습니다:', err);
       });
+  };
+
+  // 메타버스로 돌아가기 버튼 클릭 핸들러
+  const handleMetaverseReturn = () => {
+    navigate('/usermetaverse'); // usermetaverse로 이동
   };
 
   const { nickname, memberType, name, age, weight, gender, averageSteps } = userData;
@@ -161,6 +167,17 @@ function AiChat() {
               >
                 <ManageIcon className="size-5 opacity-75" />
                 <span className="text-sm font-medium"> 관리자 연결 </span>
+              </button>
+            </li>
+
+            {/* 메타버스로 돌아가기 버튼 추가 */}
+            <li className="hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={handleMetaverseReturn}
+                className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-700"
+              >
+                <PublicIcon className="size-5 opacity-75" />
+                <span className="text-sm font-medium">메타버스</span>
               </button>
             </li>
           </ul>

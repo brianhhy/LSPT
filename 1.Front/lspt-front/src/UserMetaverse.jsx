@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import logo from './assets/smalllogo.png';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import './UserMetaverse.css';
 // Importing Material Icons
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PsychologyIcon from '@mui/icons-material/Psychology';
@@ -31,48 +31,49 @@ function UserMetaverse() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [headerText, setHeaderText] = useState('사용자 신체정보');
+  const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
   useEffect(() => {
-    const toastId1 = toast.info(
-      <div style={{ fontSize: '16px', color: '#333' }}>
-        키보드 <strong style={{ color: '#007BFF' }}>m</strong> 입력을 통해 <strong style={{ color: '#007BFF' }}>기능창</strong>을 활성화 할 수 있습니다!
-        <button onClick={() => toast.dismiss(toastId1)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          이해 했습니다!
-        </button>
-      </div>,
-      {
-        position: "top-left",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      }
-    );
+    const showToasts = !localStorage.getItem('acknowledgedToasts');
 
-    const toastId2 = toast.info(
-      <div style={{ fontSize: '16px', color: '#333' }}>
-        키보드 <strong style={{ color: '#007BFF' }}>c</strong> 입력을 통해 <br/><strong style={{ color: '#007BFF' }}>채팅창</strong>을 활성화 할 수 있습니다!
-        <button onClick={() => toast.dismiss(toastId2)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          이해 했습니다!
-        </button>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      }
-    );
+    if (showToasts) {
+      const toastId1 = toast.info(
+        <div style={{ fontSize: '16px', color: '#333' }}>
+          키보드 <strong style={{ color: '#007BFF' }}>m</strong> 입력을 통해 <strong style={{ color: '#007BFF' }}>기능창</strong>을 활성화 할 수 있습니다!
+          <button onClick={() => handleToastAcknowledge(toastId1)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            이해 했습니다!
+          </button>
+        </div>,
+        {
+          position: "top-left",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        }
+      );
 
-    return () => {
-      toast.dismiss();
-    };
+      const toastId2 = toast.info(
+        <div style={{ fontSize: '16px', color: '#333' }}>
+          키보드 <strong style={{ color: '#007BFF' }}>c</strong> 입력을 통해 <br/><strong style={{ color: '#007BFF' }}>채팅창</strong>을 활성화 할 수 있습니다!
+          <button onClick={() => handleToastAcknowledge(toastId2)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            이해 했습니다!
+          </button>
+        </div>,
+        {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        }
+      );
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -90,6 +91,29 @@ function UserMetaverse() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    const loadingElement = document.querySelector('.loading');
+
+    const handleAnimationEnd = () => {
+      setLoading(false);
+    };
+
+    if (loadingElement) {
+      loadingElement.addEventListener('animationend', handleAnimationEnd);
+    }
+
+    return () => {
+      if (loadingElement) {
+        loadingElement.removeEventListener('animationend', handleAnimationEnd);
+      }
+    };
+  }, []);
+
+  const handleToastAcknowledge = (toastId) => {
+    toast.dismiss(toastId);
+    localStorage.setItem('acknowledgedToasts', 'true');
+  };
 
   const toggleLeftSidebar = () => {
     setLeftSidebarOpen((prev) => !prev);
@@ -246,7 +270,18 @@ function UserMetaverse() {
 
       {/* Main Content */}
       <div className={`flex-1 flex flex-col items-center justify-center transition-all duration-300 ${leftSidebarOpen || rightSidebarOpen ? 'ml-64 mr-64' : ''}`}>
-        <h1 className="text-white text-5xl mb-4">Metaverse</h1>
+        {loading ? (
+          <div className="flex flex-col items-center">
+          <img src={logo} alt="Logo" style={{ width: '100px', height: '144px' }} />
+          <div className="progressbar mb-1"> {/* mb-1으로 변경하여 간격을 최소화 */}
+            <span className="loading"></span>
+          </div>
+          <h3 className="text-white text-2xl mt-8">로딩중입니다!</h3> {/* mt-2로 위아래 텍스트 간격 최소화 */}
+        </div>
+        
+        ) : (
+          <h1 className="text-white text-5xl mb-4 fade-in">Metaverse</h1>
+        )}
       </div>
     </div>
   );

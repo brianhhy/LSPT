@@ -6,7 +6,7 @@ function AiChatBox() {
   const [messages, setMessages] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [feedbackOptions, setFeedbackOptions] = useState({
-    bodyInfo: true,  // 신체정보 체크박스 기본 체크 상태
+    bodyInfo: true,  // 신체정보 체크박스 기본 체크 상태 (해제 불가)
     heartRate: false,
     breathingRate: false,
     stepCount: false,
@@ -64,7 +64,7 @@ function AiChatBox() {
               className={`relative mb-6 text-left ${msg.sender === 'You' ? 'text-right' : ''} ${msg.show ? 'fade-in' : ''}`}
               style={{ opacity: msg.show ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}
             >
-              <div className={`inline-block rounded-md py-3 px-4 ${msg.sender === 'You' ? 'bg-blue-700 text-white' : 'bg-gray-200'}`}>
+              <div className={`inline-block rounded-md py-3 px-4 ${msg.sender === 'You' ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}>
                 <p className="text-base">{msg.text}</p>
               </div>
             </div>
@@ -106,7 +106,7 @@ function AiChatBox() {
                 type="checkbox"
                 name="bodyInfo"
                 checked={feedbackOptions.bodyInfo}
-                onChange={handleOptionChange}
+                disabled // 신체정보 체크박스는 해제 불가
               />
               신체정보(☆필수☆)
             </label>
@@ -156,11 +156,10 @@ function AiChatBox() {
           <button className="bg-blue-700 text-white p-2 rounded text-lg">확인</button>
         </div>
 
-        {/* Lower Section: Guide */}
         <div className="flex-1">
           <h3 className="text-xl font-semibold mb-4">가이드라인</h3>
           <ol className="list-decimal list-inside text-lg">
-            <li>날짜에 해당하는 신체정보를 선택한다</li>
+            <li>날짜에 해당하는 신체정보를 선택한다.</li>
             <ol className="list-decimal list-inside ml-4">
               <li>현재 신체정보를 피드백 받고 싶다면 사용자 정보 클릭 후 채팅창에 붙여 넣기한다.</li>
               <li>지난 신체정보를 피드백 받고 싶다면 지난 신체정보를 클릭해 특정 날짜를 선택 후 사용자 정보를 클릭해 채팅창에 붙여 넣는다.</li>
