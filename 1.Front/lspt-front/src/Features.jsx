@@ -170,14 +170,13 @@ export default function Features() {
         </Dialog>
       </header>
 
-      {/* Fixed Navigation */}
-      <div className="fixed top-1/4 right-0 z-50 bg-transparent text-white rounded-l-lg shadow-lg p-4">
+      <div className="fixed top-1/4 left-0 z-50 bg-transparent text-white rounded-l-lg shadow-lg p-4">
         <ul className="space-y-4">
-          <li><button onClick={() => scrollToSection(startRef)} className="text-lg">할머니를 부탁해를 시작하세요</button></li>
-          <li><button onClick={() => scrollToSection(teamRef)} className="text-lg">팀원 소개</button></li>
-          <li><button onClick={() => scrollToSection(productValueRef)} className="text-lg">Product Value</button></li>
-          <li><button onClick={() => scrollToSection(techValueRef)} className="text-lg">Tech Value</button></li>
-          <li><button onClick={() => scrollToSection(functionValueRef)} className="text-lg">주요 기능</button></li>
+          <li><button onClick={() => scrollToSection(startRef)} className="text-lg">1. 할머니를 부탁해를 시작하세요</button></li>
+          <li><button onClick={() => scrollToSection(teamRef)} className="text-lg">2. 팀원 소개</button></li>
+          <li><button onClick={() => scrollToSection(productValueRef)} className="text-lg">3. Product Value</button></li>
+          <li><button onClick={() => scrollToSection(techValueRef)} className="text-lg">4. Tech Value</button></li>
+          <li><button onClick={() => scrollToSection(functionValueRef)} className="text-lg">5. 주요 기능</button></li>
           
         </ul>
       </div>
@@ -190,7 +189,7 @@ export default function Features() {
                 할머니를 부탁해를 시작하세요
               </h2>
               <p className="sm:text-lg lg:text-xl text-left">
-                Fitbit Sense2를 활용한 신체 정보 수집을 통해 할머니를 부탁해에서 제공하는 여러 기능을 사용하세요. 메타버스를 통해 사용자에게 동적인 경험을 제공합니다.
+                Fitbit Sense2를 활용한 신체 정보 수집을 통해 할머니를 부탁해에서 제공하는 여러 기능을 사용하세요. 메타버스를 통해 <br className="hidden lg:inline-block" />사용자에게 동적인 경험을 제공합니다.
               </p>
               <Link 
                 to="/login" 
@@ -417,9 +416,9 @@ export default function Features() {
           </div>
           <div className="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
             <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-white">
-              메타버스를 활용한
+              AI를 활용한
               <br className="hidden lg:inline-block" />
-              실시간 소통
+              실시간 건강 상담 서비스
             </h1>
             <p className="mb-8 leading-relaxed text-white">
               메타버스 세상에서 다른 사용자와 실시간으로 소통합니다. 또한 할머니를 부탁해에서 제공하는

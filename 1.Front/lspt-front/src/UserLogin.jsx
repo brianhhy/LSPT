@@ -133,6 +133,8 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
 }
 
 function PatientInfo({ setShowPatientInfo, setUserType }) {
+  const navigate = useNavigate(); // Add this line to get the navigate function
+
   return (
     <div className="relative overflow-hidden bg-white py-24 sm:py-32 fade-in">
       <button
@@ -166,6 +168,7 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
                       <button
                         className="rounded-md px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
+                        onClick={() => navigate('/usermetaverse')} // Modify this line to navigate to UserMetaverse
                       >
                         Fitbit 연동하기
                       </button>
@@ -184,6 +187,7 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
     </div>
   );
 }
+
 
 function Auth({ userType, setUserType }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -282,7 +286,6 @@ function LoginForm({ setIsLogin, userType }) {
   );
 }
 
-
 function SignUpForm({ setIsLogin, userType }) {
   const [formData, setFormData] = useState({
     nickname: '',
@@ -307,7 +310,13 @@ function SignUpForm({ setIsLogin, userType }) {
     }
     const dataKey = userType === '관리자 회원' ? 'adminData' : 'userData';
     localStorage.setItem(dataKey, JSON.stringify(formData));
-    navigate('/metaverse'); // Redirect to Metaverse page
+
+    // 관리자 회원이면 /adminmetaverse로 이동, 일반 회원이면 /metaverse로 이동
+    if (userType === '관리자 회원') {
+      navigate('/adminmetaverse');
+    } else {
+      navigate('/metaverse');
+    }
   };
 
   return (
@@ -349,7 +358,7 @@ function SignUpForm({ setIsLogin, userType }) {
         placeholder="비밀번호 확인"
         value={formData.confirmPassword}
         onChange={handleInputChange}
-        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w/full"
         required
       />
       <div className="flex items-center">
@@ -364,7 +373,7 @@ function SignUpForm({ setIsLogin, userType }) {
       </div>
       <button
         type="submit"
-        className="mt-4 transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
+        className="mt-4 transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w/full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
         style={{ background: '#7F7FD5' }}
       >
         <span className="inline-block mr-2">회원가입</span>
@@ -379,6 +388,5 @@ function SignUpForm({ setIsLogin, userType }) {
     </form>
   );
 }
-
 
 export default UserLogin;

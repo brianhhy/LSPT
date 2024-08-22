@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from './assets/smalllogo.png';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-// Importing Material Icons
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageIcon from '@mui/icons-material/ManageAccounts';
@@ -13,9 +9,23 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import userImg from './assets/user.png';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import AiChatBox from './AiChatBox';
+import AdminChatBox from './AdminChatBox';
 
-function UserMetaverse() {
-  // Predefined user data
+
+function AiChat() {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('AI 상담 서비스'); // Default tab
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [headerText, setHeaderText] = useState('사용자 신체정보');
+
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab); // Set tab based on the state passed
+    }
+  }, [location.state]);
+
   const userData = {
     nickname: 'hoyeon',
     memberType: '일반 회원',
@@ -26,81 +36,9 @@ function UserMetaverse() {
     averageSteps: '8,000보',
   };
 
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [headerText, setHeaderText] = useState('사용자 신체정보');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const toastId1 = toast.info(
-      <div style={{ fontSize: '16px', color: '#333' }}>
-        키보드 <strong style={{ color: '#007BFF' }}>m</strong> 입력을 통해 <strong style={{ color: '#007BFF' }}>기능창</strong>을 활성화 할 수 있습니다!
-        <button onClick={() => toast.dismiss(toastId1)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          이해 했습니다!
-        </button>
-      </div>,
-      {
-        position: "top-left",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      }
-    );
-
-    const toastId2 = toast.info(
-      <div style={{ fontSize: '16px', color: '#333' }}>
-        키보드 <strong style={{ color: '#007BFF' }}>c</strong> 입력을 통해 <br/><strong style={{ color: '#007BFF' }}>채팅창</strong>을 활성화 할 수 있습니다!
-        <button onClick={() => toast.dismiss(toastId2)} style={{ marginTop: '10px', display: 'block', backgroundColor: '#007BFF', color: '#FFF', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          이해 했습니다!
-        </button>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      }
-    );
-
-    return () => {
-      toast.dismiss();
-    };
-  }, [navigate]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'm') {
-        toggleLeftSidebar();
-      } else if (e.key === 'c') {
-        toggleRightSidebar();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  const toggleLeftSidebar = () => {
-    setLeftSidebarOpen((prev) => !prev);
-  };
-
-  const toggleRightSidebar = () => {
-    setRightSidebarOpen((prev) => !prev);
-  };
-
-  const navigateToAiChat = (activeTab) => {
-    navigate('/aichat', { state: { activeTab } }); // Pass the active tab state
+  const handleHealthInfoClick = () => {
+    setSelectedDate(new Date()); // Reset to today's date
+    setHeaderText('사용자 신체정보'); // Reset the header text
   };
 
   const handleSearchClick = () => {
@@ -110,24 +48,33 @@ function UserMetaverse() {
     }
   };
 
-  const handleHealthInfoClick = () => {
-    setSelectedDate(new Date()); // Reset to today's date
-    setHeaderText('사용자 신체정보'); // Reset the header text
-  };
-
-  const handleLogout = () => {
-    navigate('/login'); // Adjust the path to your login component
+  // 클립보드에 사용자 정보를 복사하는 함수
+  const copyToClipboard = () => {
+    const userInfo = `
+      닉네임: ${userData.nickname}
+      회원 유형: ${userData.memberType}
+      이름: ${userData.name}
+      나이: ${userData.age}
+      몸무게: ${userData.weight}
+      성별: ${userData.gender}
+      평균 걸음: ${userData.averageSteps}
+    `;
+    navigator.clipboard.writeText(userInfo)
+      .then(() => {
+        alert('사용자 정보가 클립보드에 복사되었습니다.');
+      })
+      .catch((err) => {
+        console.error('클립보드 복사에 실패했습니다:', err);
+      });
   };
 
   const { nickname, memberType, name, age, weight, gender, averageSteps } = userData;
 
   return (
     <div className="min-h-screen flex relative">
-      <ToastContainer />
-
       {/* Left Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white p-8 shadow-md flex flex-col justify-between transition-transform duration-300 ${leftSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white p-8 shadow-md flex flex-col justify-between transition-transform duration-300`}
       >
         <div className="flex flex-col items-center">
           <img src={logo} alt="Logo" className="mt-4" style={{ width: '70.5px', height: '101.5px' }} />
@@ -135,7 +82,7 @@ function UserMetaverse() {
 
         <div className="flex-1 px-4 py-6">
           <ul className="space-y-3">
-            <li className="bg-gray-100 rounded-lg">
+            <li className="bg-gray-100 rounded-lg"> 
               <a
                 href="#"
                 className="flex items-center gap-2 px-4 py-2 text-gray-700"
@@ -147,9 +94,13 @@ function UserMetaverse() {
             </li>
 
             {/* User Body Information */}
-            <div className="mt-6">
-              <h3 className="text-lg font-bold">{headerText}</h3>
-              <p className="text-sm mt-2"><strong>닉네임:</strong> {nickname}</p>
+            <div 
+              className="bg-white p-4 rounded-lg shadow-md cursor-pointer"
+              onClick={copyToClipboard} // 클릭하면 복사되는 기능 추가
+              style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} // 텍스트가 입력창을 벗어나지 않도록 조정
+            >
+              <h3 className="text-lg font-bold mb-2">사용자 정보</h3>
+              <p className="text-sm"><strong>닉네임:</strong> {nickname}</p>
               <p className="text-sm"><strong>회원 유형:</strong> {memberType}</p>
               <p className="text-sm"><strong>이름:</strong> {name}</p>
               <p className="text-sm"><strong>나이:</strong> {age}</p>
@@ -193,7 +144,7 @@ function UserMetaverse() {
 
             <li className="hover:bg-gray-100 rounded-lg">
               <button
-                onClick={() => navigateToAiChat('AI 상담 서비스')}
+                onClick={() => setActiveTab('AI 상담 서비스')}
                 className="group flex items-center justify-between px-4 py-2 text-gray-500 hover:text-gray-700"
               >
                 <div className="flex items-center gap-2">
@@ -205,7 +156,7 @@ function UserMetaverse() {
 
             <li className="hover:bg-gray-100 rounded-lg">
               <button
-                onClick={() => navigateToAiChat('관리자 상담 서비스')}
+                onClick={() => setActiveTab('관리자 상담 서비스')}
                 className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-700"
               >
                 <ManageIcon className="size-5 opacity-75" />
@@ -215,8 +166,8 @@ function UserMetaverse() {
           </ul>
         </div>
 
-        <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 p-4 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2 bg-white hover:bg-gray-50">
+        <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
+          <a href="#" className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
             <img
               alt=""
               src={userImg}
@@ -229,27 +180,70 @@ function UserMetaverse() {
               </p>
             </div>
           </a>
-          <button onClick={handleLogout} className="text-gray-500 hover:text-gray-700">
-            <LogoutIcon className="size-6 opacity-75" />
-          </button>
-        </div>
-      </div>
-
-      {/* Right Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white p-8 shadow-md flex flex-col justify-center transition-transform duration-300 ${rightSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div>
-          <h2 className="text-2xl mb-4">채팅창 및 바로가기 사이드바</h2>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col items-center justify-center transition-all duration-300 ${leftSidebarOpen || rightSidebarOpen ? 'ml-64 mr-64' : ''}`}>
-        <h1 className="text-white text-5xl mb-4">Metaverse</h1>
+      <div className="flex-1 flex flex-col items-center justify-start pt-10">
+        {/* Tabs Component */}
+        <div className="max-w-max">
+          <div className="bg-transparent z-10 shadow-md">
+            <div className="sm:hidden">
+              <label htmlFor="Tab" className="sr-only">Tab</label>
+
+              <select
+                id="Tab"
+                className="w-full rounded-md border-gray-200"
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value)}
+              >
+                <option>AI 상담 서비스</option>
+                <option>관리자 상담 서비스</option>
+              </select>
+            </div>
+
+            <div className="hidden sm:block">
+              <nav className="flex gap-6 p-4 justify-center" aria-label="Tabs">
+                <a
+                  href="#"
+                  className={`shrink-0 rounded-lg p-2 text-sm font-medium ${
+                    activeTab === 'AI 상담 서비스'
+                      ? 'bg-sky-100 text-sky-600'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700'
+                  }`}
+                  onClick={() => setActiveTab('AI 상담 서비스')}
+                >
+                  AI 상담 서비스
+                </a>
+
+                <a
+                  href="#"
+                  className={`shrink-0 rounded-lg p-2 text-sm font-medium ${
+                    activeTab === '관리자 상담 서비스'
+                      ? 'bg-sky-100 text-sky-600'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700'
+                  }`}
+                  onClick={() => setActiveTab('관리자 상담 서비스')}
+                >
+                  관리자 상담 서비스
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        {/* Centered ChatBox */}
+        <div className="flex-1 flex items-center justify-center w-full">
+          {activeTab === 'AI 상담 서비스' && (
+            <AiChatBox />
+          )}
+          {activeTab === '관리자 상담 서비스' && (
+            <AdminChatBox /> 
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default UserMetaverse;
+export default AiChat;
