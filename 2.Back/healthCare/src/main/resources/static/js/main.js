@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let playerId;
     let buildingMesh;
     let moveToPosition = null;
-    const moveSpeed = 0.05;
+    const moveSpeed = 0.1;
     const walkAnimSpeed = 1.0;
     const positionThreshold = 0.1; // 목표 위치에 도달했는지 확인하는 임계값
 
@@ -54,7 +54,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (!player) {
                 player = meshes[0];
                 playerSkeleton = skeletons[0];
-                player.position = new BABYLON.Vector3(0, 0.6, 0);
+                player.position = new BABYLON.Vector3(0, 0, 0);
                 player.scaling = new BABYLON.Vector3(1, 1, 1);
 
                 walkAnim = animationGroups.find(animGroup => animGroup.name === "Walking");
@@ -70,12 +70,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 engine.runRenderLoop(() => {
                     if (moveToPosition) {
-                        // 목표 위치까지 부드럽게 이동
                         const direction = moveToPosition.subtract(player.position).normalize();
                         const distance = BABYLON.Vector3.Distance(player.position, moveToPosition);
 
                         if (distance > positionThreshold) {
                             player.position.addInPlace(direction.scale(moveSpeed));
+                            player.lookAt(moveToPosition);
+
+                            if (playerSkeleton && walkAnim) {
+                                walkAnim.start(true, walkAnimSpeed, walkAnim.from, walkAnim.to, true);
+                            }
                         } else {
                             player.position.copyFrom(moveToPosition);
                             moveToPosition = null;
@@ -103,7 +107,7 @@ window.addEventListener('DOMContentLoaded', () => {
         engine.resize();
     });
 
-    const socket = new WebSocket("wss://localhost:8443/ws/player");
+    const socket = new WebSocket("ws://localhost:8081/ws/player");
 
     socket.onopen = () => {
         console.log("Connected to WebSocket server");
@@ -120,19 +124,29 @@ window.addEventListener('DOMContentLoaded', () => {
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
+        console.log("Received message:", data);
+
         if (data.type === 'clientId') {
             playerId = data.playerId;
             console.log("Player ID received:", playerId);
         } else if (data.type === 'updatePosition') {
+            console.log("Received updatePosition message");
+
             const updateId = data.playerId;
+            console.log("UpdatePlayerId:", updateId);
+            console.log("Position data:", data.position);
+
             if (updateId === playerId) {
+                // 자신의 위치 업데이트
                 if (player) {
                     player.position.x = data.position.x;
                     player.position.y = data.position.y;
                     player.position.z = data.position.z;
+                    console.log("Updated own position:", player.position);
                 }
             } else {
                 if (!otherPlayers[updateId]) {
+                    // 새로운 플레이어 로드
                     BABYLON.SceneLoader.ImportMesh("", "/assets/", "boy4.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
                         const newPlayer = meshes[0];
                         newPlayer.position = new BABYLON.Vector3(data.position.x, data.position.y, data.position.z);
@@ -142,7 +156,10 @@ window.addEventListener('DOMContentLoaded', () => {
                         const newIdleAnim = animationGroups.find(animGroup => animGroup.name === "Idle");
 
                         if (newWalkAnim && newIdleAnim) {
-                            newIdleAnim.start(true, 1.0, newIdleAnim.from, newIdleAnim.to, true);
+                            // 걷기 애니메이션만 항상 실행
+                            newWalkAnim.start(true, walkAnimSpeed, newWalkAnim.from, newWalkAnim.to, true);
+                        } else {
+                            console.warn("Animations not found.");
                         }
 
                         otherPlayers[updateId] = {
@@ -150,49 +167,43 @@ window.addEventListener('DOMContentLoaded', () => {
                             skeleton: newPlayerSkeleton,
                             walkAnim: newWalkAnim,
                             idleAnim: newIdleAnim,
+                            targetPosition: new BABYLON.Vector3(data.position.x, data.position.y, data.position.z),
                             previousPosition: newPlayer.position.clone(),
                             lastUpdateTime: Date.now()
                         };
                         console.log("Loaded new player:", updateId);
                     });
                 } else {
+                    // 기존 플레이어 업데이트
+                    console.log("updatePosition");
                     const otherPlayer = otherPlayers[updateId];
                     const playerMesh = otherPlayer.mesh;
                     const now = Date.now();
-                    const previousPosition = otherPlayer.previousPosition;
                     const elapsedTime = (now - otherPlayer.lastUpdateTime) / 1000;
-                    const speed = moveSpeed * elapsedTime;
+                    const moveAmount = moveSpeed * elapsedTime;
 
-                    const currentPosition = new BABYLON.Vector3(data.position.x, data.position.y, data.position.z);
-                    const direction = currentPosition.subtract(previousPosition).normalize();
-                    const distance = BABYLON.Vector3.Distance(previousPosition, currentPosition);
-                    const moveAmount = Math.min(distance, speed);
+                    console.log("Elapsed time:", elapsedTime);
+                    console.log("Move amount:", moveAmount);
 
-                    if (moveAmount > 0) {
-                        playerMesh.position.addInPlace(direction.scale(moveAmount));
-                        if (distance < moveAmount) {
-                            playerMesh.position.copyFrom(currentPosition);
-                        }
+                    const targetPosition = new BABYLON.Vector3(data.position.x, data.position.y, data.position.z);
+                    const direction = targetPosition.subtract(playerMesh.position).normalize();
+                    const distance = BABYLON.Vector3.Distance(playerMesh.position, targetPosition);
+
+                    console.log("Direction:", direction);
+                    console.log("Distance to target:", distance);
+
+                    playerMesh.lookAt(targetPosition);
+                    // 목표 위치에 도달
+                    playerMesh.position.copyFrom(targetPosition);
+                    if (playerMesh.skeleton && otherPlayer.walkAnim) {
+                        // 걷기 애니메이션만 항상 실행
+                        otherPlayer.walkAnim.start(true, walkAnimSpeed, otherPlayer.walkAnim.from, otherPlayer.walkAnim.to, true);
                     }
 
-                    if (playerMesh.position.equals(currentPosition)) {
-                        if (playerMesh.skeleton && otherPlayer.walkAnim) {
-                            otherPlayer.walkAnim.stop();
-                            if (otherPlayer.idleAnim) {
-                                otherPlayer.idleAnim.start(true, 1.0, otherPlayer.idleAnim.from, otherPlayer.idleAnim.to, true);
-                            }
-                        }
-                    } else {
-                        if (playerMesh.skeleton && otherPlayer.idleAnim) {
-                            otherPlayer.idleAnim.stop();
-                            if (otherPlayer.walkAnim) {
-                                otherPlayer.walkAnim.start(true, 1.0, otherPlayer.walkAnim.from, otherPlayer.walkAnim.to, true);
-                            }
-                        }
-                    }
-
-                    otherPlayer.previousPosition.copyFrom(currentPosition);
+                    otherPlayer.targetPosition = targetPosition;
                     otherPlayer.lastUpdateTime = now;
+
+                    console.log("Updated other player position:", playerMesh.position);
                 }
             }
         } else if (data.type === 'removePlayer') {
@@ -251,22 +262,22 @@ window.addEventListener('DOMContentLoaded', () => {
         switch(event.key) {
             case 'w':
                 player.position.z += moveSpeed;
-                targetPosition.z += 1;
+                targetPosition.z += 2;
                 moved = true;
                 break;
             case 's':
                 player.position.z -= moveSpeed;
-                targetPosition.z -= 1;
+                targetPosition.z -= 2;
                 moved = true;
                 break;
             case 'a':
                 player.position.x -= moveSpeed;
-                targetPosition.x -= 1;
+                targetPosition.x -= 2;
                 moved = true;
                 break;
             case 'd':
                 player.position.x += moveSpeed;
-                targetPosition.x += 1;
+                targetPosition.x += 2;
                 moved = true;
                 break;
         }
