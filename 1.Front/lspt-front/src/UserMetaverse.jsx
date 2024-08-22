@@ -149,13 +149,13 @@ function UserMetaverse() {
             {/* User Body Information */}
             <div className="mt-6">
               <h3 className="text-lg font-bold">{headerText}</h3>
-              <p className="text-sm mt-2"><strong>닉네임:</strong> {nickname}</p>
-              <p className="text-sm"><strong>회원 유형:</strong> {memberType}</p>
-              <p className="text-sm"><strong>이름:</strong> {name}</p>
-              <p className="text-sm"><strong>나이:</strong> {age}</p>
-              <p className="text-sm"><strong>몸무게:</strong> {weight}</p>
-              <p className="text-sm"><strong>성별:</strong> {gender}</p>
-              <p className="text-sm"><strong>평균 걸음:</strong> {averageSteps}</p>
+              <p className="text-sm mt-2"><strong>닉네임 : </strong> {nickname}</p>
+              <p className="text-sm"><strong>회원 유형 : </strong> {memberType}</p>
+              <p className="text-sm"><strong>이름 : </strong> {name}</p>
+              <p className="text-sm"><strong>나이 : </strong> {age}</p>
+              <p className="text-sm"><strong>몸무게 : </strong> {weight}</p>
+              <p className="text-sm"><strong>성별 : </strong> {gender}</p>
+              <p className="text-sm"><strong>평균 걸음 : </strong> {averageSteps}</p>
             </div>
 
             <li className="hover:bg-gray-100 rounded-lg">
