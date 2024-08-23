@@ -6,7 +6,7 @@ function AiChatBox() {
   const [messages, setMessages] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [feedbackOptions, setFeedbackOptions] = useState({
-    bodyInfo: true,  // 신체정보 체크박스 기본 체크 상태
+    bodyInfo: true,  // 신체정보 체크박스 기본 체크 상태 (해제 불가)
     heartRate: false,
     breathingRate: false,
     stepCount: false,
@@ -34,12 +34,57 @@ function AiChatBox() {
 
   const [input, setInput] = useState('');
 
-  const handleSend = () => {
+
+  /*-----------------------------------↓대영수정--------------------------------------------------*/
+  const handleSend = async () => {
     if (input.trim()) {
-      setMessages([...messages, { id: messages.length + 1, text: input, sender: 'You', show: true }]);
+      const userMessage = { id: messages.length + 1, text: input, sender: 'You', show: true };
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages);  // 대화 히스토리를 업데이트합니다.
       setInput('');
+  
+      // POST 요청을 보냄
+      try {
+        const response = await fetch('https://localhost:8443/consult', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',  // 쿠키를 포함하여 요청
+          body: JSON.stringify({
+            messages: updatedMessages.map(m => ({
+              role: m.sender === 'You' ? 'user' : 'assistant',
+              content: m.text
+            }))
+          }),  // 대화 히스토리를 API 요청에 포함합니다.
+        });
+  
+        if (response.ok) {
+          const result = await response.json();
+          const gptMessage = result.message;  // 응답에서 메시지 추출
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { id: prevMessages.length + 1, text: gptMessage, sender: 'master', show: true },
+          ]);
+        } else {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { id: prevMessages.length + 1, text: '서버에서 응답을 받을 수 없습니다.', sender: 'master', show: true },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { id: prevMessages.length + 1, text: '메시지를 보내는 중 오류가 발생했습니다.', sender: 'master', show: true },
+        ]);
+      }
     }
   };
+  
+
+
+  /*----------------------------------------↑대영수정------------------------------------------------------*/
 
   const handleOptionChange = (event) => {
     setFeedbackOptions({
@@ -47,6 +92,104 @@ function AiChatBox() {
       [event.target.name]: event.target.checked,
     });
   };
+
+
+  /*--------------------------------------------↓대영수정-------------------------------------------------------*/
+  const fetchData = async () => {
+    if (!selectedDate) {
+      setMessages([...messages, { id: messages.length + 1, text: '날짜를 선택해주세요.', sender: 'master', show: true }]);
+      return;
+    }
+  
+    const formattedDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+    const apiCalls = [];
+  
+    console.log('Selected options:', feedbackOptions);
+    console.log('Selected date:', formattedDate);
+  
+    // 각 API 호출에 쿠키 포함
+    const fetchOptions = {
+      method: 'GET',
+      credentials: 'include',  // 쿠키를 포함하여 요청
+    };
+  
+    if (feedbackOptions.bodyInfo) {
+      console.log('Calling body info API...');
+      apiCalls.push(fetch('https://localhost:8443/api/profile', fetchOptions).then(res => res.json()));
+    }
+    if (feedbackOptions.heartRate) {
+      console.log('Calling heart rate API...');
+      apiCalls.push(fetch(`https://localhost:8443/api/heartrate/time?date=${formattedDate}`, fetchOptions).then(res => res.json()));
+    }
+    if (feedbackOptions.breathingRate) {
+      console.log('Calling breathing rate API...');
+      apiCalls.push(fetch(`https://localhost:8443/api/breathing_rate?date=${formattedDate}`, fetchOptions).then(res => res.json()));
+    }
+    if (feedbackOptions.stepCount) {
+      console.log('Calling step count API...');
+      apiCalls.push(fetch(`https://localhost:8443/api/activities?date=${formattedDate}`, fetchOptions).then(res => res.json()));
+    }
+  
+    try {
+      const responses = await Promise.all(apiCalls);
+      let responseData = {};
+  
+      // 각 API 응답을 하나의 객체로 합치기
+      responses.forEach((data, index) => {
+        if (index === 0 && feedbackOptions.bodyInfo) {
+          // 신체정보 데이터 파싱
+          const { age, gender, height, weight, strideLengthRunning, stridelengthWalking } = data.user;
+          responseData = {
+            ...responseData,
+            age,
+            gender,
+            height,
+            weight,
+            strideLengthRunning,
+            stridelengthWalking
+          };
+        } else if (feedbackOptions.heartRate && index === 1) {
+          responseData.heartRate = data;  // 심박수 데이터 추가
+        } else if (feedbackOptions.breathingRate && index === 2) {
+          responseData.breathingRate = data;  // 호흡률 데이터 추가
+        } else if (feedbackOptions.stepCount && index === 3) {
+          responseData.stepCount = data;  // 걸음걸이 데이터 추가
+        }
+      });
+  
+      // 모든 데이터를 POST 요청으로 전송
+      const postResponse = await fetch('https://localhost:8443/consult-health', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',  // 쿠키를 포함하여 요청
+        body: JSON.stringify(responseData),
+      });
+  
+      if (postResponse.ok) {
+        const result = await postResponse.json();
+        const messageContent = result.message; // message 내용만 추출
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { id: prevMessages.length + 1, text: messageContent, sender: 'master', show: true },
+        ]);
+      } else {
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { id: prevMessages.length + 1, text: 'POST 요청이 실패했습니다.', sender: 'master', show: true },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        { id: prevMessages.length + 1, text: '데이터를 불러오는 중 오류가 발생했습니다.', sender: 'master', show: true },
+      ]);
+    }
+  };
+
+  /*--------------------------------------------------↑대영수정---------------------------------------------------------*/
 
   return (
     <div className="flex">
@@ -64,7 +207,7 @@ function AiChatBox() {
               className={`relative mb-6 text-left ${msg.sender === 'You' ? 'text-right' : ''} ${msg.show ? 'fade-in' : ''}`}
               style={{ opacity: msg.show ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}
             >
-              <div className={`inline-block rounded-md py-3 px-4 ${msg.sender === 'You' ? 'bg-blue-700 text-white' : 'bg-gray-200'}`}>
+              <div className={`inline-block rounded-md py-3 px-4 ${msg.sender === 'You' ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}>
                 <p className="text-base">{msg.text}</p>
               </div>
             </div>
@@ -106,7 +249,7 @@ function AiChatBox() {
                 type="checkbox"
                 name="bodyInfo"
                 checked={feedbackOptions.bodyInfo}
-                onChange={handleOptionChange}
+                disabled // 신체정보 체크박스는 해제 불가
               />
               신체정보(☆필수☆)
             </label>
@@ -153,20 +296,20 @@ function AiChatBox() {
               className="w-full p-2 border border-gray-300 rounded text-lg"
             />
           </div>
-          <button className="bg-blue-700 text-white p-2 rounded text-lg">확인</button>
+          <button className="bg-blue-700 text-white p-2 rounded text-lg"
+          onClick={fetchData}
+          >확인</button>
         </div>
 
-        {/* Lower Section: Guide */}
         <div className="flex-1">
           <h3 className="text-xl font-semibold mb-4">가이드라인</h3>
           <ol className="list-decimal list-inside text-lg">
-            <li>날짜에 해당하는 신체정보를 선택한다</li>
+            <li>날짜에 해당하는 신체정보를 선택한다.</li>
             <ol className="list-decimal list-inside ml-4">
-              <li>현재 신체정보를 피드백 받고 싶다면 사용자 정보 클릭 후 채팅창에 붙여 넣기한다.</li>
-              <li>지난 신체정보를 피드백 받고 싶다면 지난 신체정보를 클릭해 특정 날짜를 선택 후 사용자 정보를 클릭해 채팅창에 붙여 넣는다.</li>
+              <li>Fitbit Sense2에서 제공하는 심박수, 호흡률, 걸음걸이 등 피드백이 필요한 정보를 선택한다.</li>
+              <li>조회할 날짜를 선택하여 어느 날짜의 건강 데이터를 상담받을지 선택한다.</li>
+              <li>추가로 질문하고 싶은 내용을 입력하여 상담받는다.</li>
             </ol>
-            <li className="mt-4">Fitbit Sense2에서 제공하는 심박수, 호흡률, 걸음걸이와 같이 추가로 피드백이 필요한 정보에 대해 불러올지 말지 선택한다.</li>
-            <li className="mt-4">정보 입력이 끝났다면 피드백을 진행한다.</li>
           </ol>
         </div>
       </div>

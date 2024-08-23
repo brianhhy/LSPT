@@ -25,6 +25,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
     "react-scripts": "5.0.1",
+    "react-spinners": "^0.14.1",
     "react-toastify": "^10.0.5",
     "react-transition-group": "^4.4.5",
     "web-vitals": "^2.1.4"
@@ -35,7 +36,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "https://localhost:8443",
   "eslintConfig": {
     "extends": [
       "react-app",

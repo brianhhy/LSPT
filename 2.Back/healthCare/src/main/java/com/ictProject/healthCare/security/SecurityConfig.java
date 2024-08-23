@@ -43,7 +43,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/", "/api/**", "/callback", "/authorize","/hello","/js/**", "/css/**", "/images/**","/assets/**","/ws/**").permitAll()
+                                .requestMatchers("/", "/api/**", "/callback", "/authorize","/hello","/js/**", "/css/**", "/images/**","/assets/**","/ws/**","/consult-health","/consult").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2Login ->

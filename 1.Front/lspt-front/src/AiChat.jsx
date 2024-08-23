@@ -6,35 +6,66 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageIcon from '@mui/icons-material/ManageAccounts';
 import CalendarIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PublicIcon from '@mui/icons-material/Public'; // PublicIcon 가져오기
 import userImg from './assets/user.png';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AiChatBox from './AiChatBox';
 import AdminChatBox from './AdminChatBox';
 
-
 function AiChat() {
   const location = useLocation();
+  const navigate = useNavigate(); // navigate hook 사용
   const [activeTab, setActiveTab] = useState('AI 상담 서비스'); // Default tab
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [headerText, setHeaderText] = useState('사용자 신체정보');
-
+  /*------------------------------------------↓대영수정----------------------------------*/
+  const [userData, setUserData] = useState({
+    displayName: '',
+    memberType: '일반 회원',
+    age: '',
+    weight: '',
+    height: '',
+    gender: '',
+    averageDailySteps: '',
+  });
+  /*------------------------------------------↑대영수정-----------------------------------*/
   useEffect(() => {
     if (location.state?.activeTab) {
       setActiveTab(location.state.activeTab); // Set tab based on the state passed
     }
   }, [location.state]);
 
-  const userData = {
-    nickname: 'hoyeon',
-    memberType: '일반 회원',
-    name: '홍길동',
-    age: 25,
-    weight: '70kg',
-    gender: '남성',
-    averageSteps: '8,000보',
-  };
+  /*------------------------------------------↓대영수정-----------------------------------*/
+
+  // 사용자 데이터 가져오기
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('https://localhost:8443/api/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // 세션 쿠키를 포함하여 요청을 보냅니다.
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data.user); // 받아온 데이터를 상태에 설정
+        } else {
+          console.error('사용자 데이터를 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('API 요청 중 에러 발생:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  /*-------------------------------------↑대영수정-----------------------------------*/
+
 
   const handleHealthInfoClick = () => {
     setSelectedDate(new Date()); // Reset to today's date
@@ -50,15 +81,16 @@ function AiChat() {
 
   // 클립보드에 사용자 정보를 복사하는 함수
   const copyToClipboard = () => {
+    /*---------------------------------↓대영수정---------------------------*/
     const userInfo = `
-      닉네임: ${userData.nickname}
-      회원 유형: ${userData.memberType}
-      이름: ${userData.name}
-      나이: ${userData.age}
-      몸무게: ${userData.weight}
-      성별: ${userData.gender}
-      평균 걸음: ${userData.averageSteps}
-    `;
+    닉네임: ${userData.displayName}
+    회원 유형: 일반 회원 ${userData.memberType}
+    나이: ${userData.age}
+    몸무게: ${userData.weight}
+    성별: ${userData.gender}
+    평균 걸음: ${userData.averageDailySteps}
+  `;
+  /*---------------------------------↑대영수정---------------------------*/
     navigator.clipboard.writeText(userInfo)
       .then(() => {
         alert('사용자 정보가 클립보드에 복사되었습니다.');
@@ -68,7 +100,14 @@ function AiChat() {
       });
   };
 
-  const { nickname, memberType, name, age, weight, gender, averageSteps } = userData;
+  // 메타버스로 돌아가기 버튼 클릭 핸들러
+  const handleMetaverseReturn = () => {
+    navigate('/usermetaverse'); // usermetaverse로 이동
+  };
+
+  /*------------------------------↓대영수정-------------------------------------------*/
+  const { displayName, memberType, age, weight, gender, averageDailySteps } = userData;
+  /*------------------------------↑대영수정-------------------------------------------*/
 
   return (
     <div className="min-h-screen flex relative">
@@ -99,14 +138,15 @@ function AiChat() {
               onClick={copyToClipboard} // 클릭하면 복사되는 기능 추가
               style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} // 텍스트가 입력창을 벗어나지 않도록 조정
             >
+              {/*--------------------------↓대영수정--------------------------------------*/}
               <h3 className="text-lg font-bold mb-2">사용자 정보</h3>
-              <p className="text-sm"><strong>닉네임:</strong> {nickname}</p>
-              <p className="text-sm"><strong>회원 유형:</strong> {memberType}</p>
-              <p className="text-sm"><strong>이름:</strong> {name}</p>
+              <p className="text-sm"><strong>닉네임:</strong> {displayName}</p>
+              <p className="text-sm"><strong>회원 유형:일반 회원</strong> {memberType}</p>
               <p className="text-sm"><strong>나이:</strong> {age}</p>
               <p className="text-sm"><strong>몸무게:</strong> {weight}</p>
               <p className="text-sm"><strong>성별:</strong> {gender}</p>
-              <p className="text-sm"><strong>평균 걸음:</strong> {averageSteps}</p>
+              <p className="text-sm"><strong>평균 걸음:</strong> {averageDailySteps}</p>
+              {/*--------------------------↑대영수정--------------------------------------*/}
             </div>
 
             <li className="hover:bg-gray-100 rounded-lg">
@@ -163,6 +203,17 @@ function AiChat() {
                 <span className="text-sm font-medium"> 관리자 연결 </span>
               </button>
             </li>
+
+            {/* 메타버스로 돌아가기 버튼 추가 */}
+            <li className="hover:bg-gray-100 rounded-lg">
+              <button
+                onClick={handleMetaverseReturn}
+                className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-700"
+              >
+                <PublicIcon className="size-5 opacity-75" />
+                <span className="text-sm font-medium">메타버스</span>
+              </button>
+            </li>
           </ul>
         </div>
 
@@ -175,7 +226,9 @@ function AiChat() {
             />
             <div>
               <p className="text-xs">
-                <strong className="block font-medium">{nickname}</strong>
+                {/*-------------------------↓대영수정-------------------------------*/}
+                <strong className="block font-medium">{displayName}</strong>
+                 {/*-------------------------↑대영수정-------------------------------*/}
                 <span>{memberType}</span>
               </p>
             </div>

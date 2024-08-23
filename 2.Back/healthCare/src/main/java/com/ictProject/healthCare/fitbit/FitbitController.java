@@ -73,7 +73,7 @@ public class FitbitController {
             String accessToken = (String) response.get("access_token");
             session.setAttribute("access_token", accessToken);
 
-            return "redirect:http://localhost:3000/metaverse";
+            return "redirect:http://localhost:3000/UserMetaverse";
         } catch (WebClientResponseException e) {
             redirectAttributes.addFlashAttribute("error", "Error during token request: " + e.getResponseBodyAsString());
             return "redirect:/error";
@@ -103,7 +103,7 @@ public class FitbitController {
         String accessToken = (String) session.getAttribute("access_token");
         // 이미 엑세스 토큰이 있는 경우 리다이렉트 방지
         if (accessToken != null) {
-            return "redirect:http://localhost:3000/metaverse";
+            return "redirect:http://localhost:3000/UserMetaverse";
         }
         session.setAttribute("code_verifier", codeVerifier);
 
