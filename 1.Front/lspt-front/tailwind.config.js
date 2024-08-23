@@ -8,6 +8,7 @@ module.exports = {
       animation: {
         fadeIn: 'fadeIn 1s ease-in-out',
         fadeOut: 'fadeOut 1s ease-in-out',
+        fadeRight: 'fadeRight 1s ease-in-out', // 추가된 애니메이션
       },
       keyframes: {
         fadeIn: {
@@ -17,6 +18,10 @@ module.exports = {
         fadeOut: {
           '0%': { opacity: 1 },
           '100%': { opacity: 0 },
+        },
+        fadeRight: {
+          '0%': { opacity: 0, transform: 'translateX(-20px)' },
+          '100%': { opacity: 1, transform: 'translateX(0)' },
         },
       },
       backgroundImage: {

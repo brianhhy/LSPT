@@ -1,10 +1,9 @@
 import './UserLogin.css';
 import { useState, useEffect } from 'react';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { CheckIcon, XMarkIcon, HomeIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
 import { useNavigate, Link } from 'react-router-dom';
 import biglogoImg from './assets/biglogo.png';
 import smalllogoImg from './assets/smalllogo.png';
-import GoogleLogin from './GoogleLogin';
 import patientImg from './assets/patient.png';
 import adminImg from './assets/admin.png';
 import fitbitWearImg from './assets/fitbitWear.jpg';
@@ -27,9 +26,7 @@ const normalUserFeatures = [
 ];
 
 function UserLogin() {
-  const [googleUserData, setGoogleUserData] = useState(null);
   const [userType, setUserType] = useState(null);
-  const [isLogin, setIsLogin] = useState(true);
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [showLogo, setShowLogo] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
@@ -61,13 +58,14 @@ function UserLogin() {
       ) : userType === '일반 회원' && showPatientInfo ? (
         <PatientInfo setShowPatientInfo={setShowPatientInfo} setUserType={setUserType} />
       ) : (
-        <Auth setGoogleUserData={setGoogleUserData} googleUserData={googleUserData} userType={userType} setUserType={setUserType} isLogin={isLogin} setIsLogin={setIsLogin} setShowPatientInfo={setShowPatientInfo} />
+        <Auth userType={userType} setUserType={setUserType} />
       )}
     </div>
   );
 }
 
 function SelectUserType({ setUserType, setShowPatientInfo }) {
+  const navigate = useNavigate();
   return (
     <>
       <div className="small-logo">
@@ -84,7 +82,7 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
             <div className="mt-4 flex items-baseline justify-center gap-x-2">
               <img src={patientImg} alt="환자" className="w-24 h-24 object-cover" />
             </div>
-            <button className="mt-6 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover-border">
+            <button className="mt-6 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover-border" style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}>
               시작하기
             </button>
             <p className="mt-4 text-xs leading-5 text-gray-600">
@@ -107,7 +105,7 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
             <div className="mt-4 flex items-baseline justify-center gap-x-2">
               <img src={adminImg} alt="관리자" className="w-24 h-24 object-cover" />
             </div>
-            <button className="mt-6 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover-border">
+            <button className="mt-6 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover-border" style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}>
               시작하기
             </button>
             <p className="mt-4 text-xs leading-5 text-gray-600">
@@ -124,6 +122,12 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
           </div>
         </div>
       </div>
+      <div className="mt-6">
+        <button className="flex items-center text-white text-sm" onClick={() => navigate('/')}>
+          <HomeIcon className="h-5 w-5 mr-2" />
+          홈 화면으로 돌아가기
+        </button>
+      </div>
     </>
   );
 }
@@ -132,6 +136,8 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
   const handleFitbitConnect = () => {
     window.location.href = 'https://localhost:8443/authorize';
   };
+  const navigate = useNavigate(); // Add this line to get the navigate function
+
   return (
     <div className="relative overflow-hidden bg-white py-24 sm:py-32 fade-in">
       <button
@@ -185,62 +191,36 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
   );
 }
 
-function Auth({ setGoogleUserData, googleUserData, userType, setUserType, isLogin, setIsLogin, setShowPatientInfo }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+function Auth({ userType, setUserType }) {
+  const [isLogin, setIsLogin] = useState(true);
+  
   return (
-    <div className="wrapper fade-in relative">
-      <div className="title-text">
-        <div className={`title ${isLogin ? 'login' : 'signup'}`}>
-          {isLogin ? '로그인' : '회원가입'}
+    <div className="h-screen/2 bg-white-100 flex flex-col justify-center sm:py-12 fade-in">
+      <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
+        <img src={smalllogoImg} alt="Small Logo" className="smalllogo mx-auto mb-5" onClick={() => window.location.href = 'http://localhost:3000/login'} />
+        <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
+          <div className="px-5 py-7 relative">
+            <h1 className="text-center text-black mb-4 font-semibold">{isLogin ? '관리자 회원 로그인' : '회원가입'}</h1>
+            {isLogin ? (
+              <LoginForm setIsLogin={setIsLogin} userType={userType} />
+            ) : (
+              <SignUpForm setIsLogin={setIsLogin} userType={userType} />
+            )}
+          </div>
         </div>
       </div>
-      <div className="form-container">
-        <div className="slide-controls">
-          <input type="radio" name="slide" id="login" checked={isLogin} readOnly />
-          <input type="radio" name="slide" id="signup" checked={!isLogin} readOnly />
-          <label htmlFor="login" className="slide login" onClick={() => setIsLogin(true)}>로그인</label>
-          <label htmlFor="signup" className="slide signup" onClick={() => setIsLogin(false)}>회원가입</label>
-          <div className="slider-tab" style={{ left: isLogin ? '0%' : '50%' }}></div>
-        </div>
-        <div className="form-inner">
-          <LoginForm isLogin={isLogin} setIsLogin={setIsLogin} setGoogleUserData={setGoogleUserData} googleUserData={googleUserData} userType={userType} setUserType={setUserType} setShowPatientInfo={setShowPatientInfo} />
-        </div>
-      </div>
-      <button
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        onClick={() => { setShowPatientInfo(false); setUserType(null); }}
-      >
-        <XMarkIcon className="h-6 w-6" />
-      </button>
     </div>
   );
 }
 
-function LoginForm({ isLogin, setIsLogin, setGoogleUserData, googleUserData, setUserType, userType, setShowPatientInfo }) {
+function LoginForm({ setIsLogin, userType }) {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    nickname: googleUserData ? googleUserData.name : '',
-    confirmPassword: '',
-    age: '',
-    height: '',
-    weight: '',
     memberType: userType || '',
   });
-  const [googleLoginStatus, setGoogleLoginStatus] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (googleUserData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        nickname: googleUserData.name,
-        email: googleUserData.email,
-        memberType: userType,
-      }));
-    }
-  }, [googleUserData, userType]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -249,53 +229,165 @@ function LoginForm({ isLogin, setIsLogin, setGoogleUserData, googleUserData, set
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isLogin) {
-      const storedData = JSON.parse(localStorage.getItem('userData'));
-      if (storedData && storedData.email === formData.email && storedData.password === formData.password) {
-        navigate('/metaverse');
+    const storedDataKey = userType === '관리자 회원' ? 'adminData' : 'userData';
+    const storedData = JSON.parse(localStorage.getItem(storedDataKey));
+
+    // Ensure storedData exists and compare email and password
+    if (
+      storedData &&
+      storedData.email === formData.email &&
+      storedData.password === formData.password
+    ) {
+      if (userType === '관리자 회원') {
+        navigate('/adminmetaverse'); // Redirect to Admin Metaverse page
       } else {
-        alert('이메일 또는 비밀번호가 일치하지 않습니다.');
+        navigate('/usermetaverse'); // Redirect to User Metaverse page
       }
     } else {
-      if (formData.password !== formData.confirmPassword) {
-        alert('비밀번호가 일치하지 않습니다.');
-        return;
-      }
-      localStorage.setItem('userData', JSON.stringify(formData));
+      alert('이메일 또는 비밀번호가 일치하지 않습니다.');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="px-5 py-7">
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="이메일"
+        value={formData.email}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        required
+      />
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
+      <input
+        type="password"
+        name="password"
+        placeholder="비밀번호"
+        value={formData.password}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        required
+      />
+      <button
+        type="submit"
+        className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
+        style={{ background: '#7F7FD5' }}
+      >
+        <span className="inline-block mr-2">로그인</span>
+      </button>
+      <button
+        type="button"
+        className="mt-4 transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
+        onClick={() => setIsLogin(false)}
+        style={{ background: '#7F7FD5' }}
+      >
+        <span className="inline-block mr-2">회원가입</span>
+      </button>
+    </form>
+  );
+}
+
+function SignUpForm({ setIsLogin, userType }) {
+  const [formData, setFormData] = useState({
+    nickname: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    fitbitIntegration: false,
+    memberType: userType || '',
+  });
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    const dataKey = userType === '관리자 회원' ? 'adminData' : 'userData';
+    localStorage.setItem(dataKey, JSON.stringify(formData));
+
+    // 관리자 회원이면 /adminmetaverse로 이동, 일반 회원이면 /metaverse로 이동
+    if (userType === '관리자 회원') {
+      navigate('/adminmetaverse');
+    } else {
       navigate('/metaverse');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`p-8 rounded-lg shadow-md text-center ${isLogin ? '' : 'signup'}`}>
-      <h2 className="text-2xl mb-4">{isLogin ? '로그인' : '회원가입'}</h2>
-      {!isLogin && (
-        <div className="field">
-          <input type="text" name="nickname" placeholder="닉네임" value={formData.nickname} onChange={handleInputChange} required />
-        </div>
-      )}
-      <div className="field">
-        <input type="email" name="email" placeholder="이메일" value={formData.email} onChange={handleInputChange} required />
+    <form onSubmit={handleSubmit} className="px-5 py-7 relative">
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">Nickname</label>
+      <input
+        type="text"
+        name="nickname"
+        placeholder="닉네임"
+        value={formData.nickname}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        required
+      />
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="이메일"
+        value={formData.email}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        required
+      />
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
+      <input
+        type="password"
+        name="password"
+        placeholder="비밀번호"
+        value={formData.password}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+        required
+      />
+      <label className="font-semibold text-sm text-gray-600 pb-1 block">Confirm Password</label>
+      <input
+        type="password"
+        name="confirmPassword"
+        placeholder="비밀번호 확인"
+        value={formData.confirmPassword}
+        onChange={handleInputChange}
+        className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w/full"
+        required
+      />
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          name="fitbitIntegration"
+          checked={formData.fitbitIntegration}
+          onChange={handleInputChange}
+          className="mr-2"
+        />
+        <label className="text-sm text-gray-600">Fitbit 연동</label>
       </div>
-      <div className="field">
-        <input type="password" name="password" placeholder="비밀번호" value={formData.password} onChange={handleInputChange} required />
-      </div>
-      {!isLogin && (
-        <div className="field">
-          <input type="password" name="confirmPassword" placeholder="비밀번호 확인" value={formData.confirmPassword} onChange={handleInputChange} required />
-        </div>
-      )}
-      <div className="field btn">
-        <div className="btn-layer"></div>
-        <input type="submit" value={isLogin ? '로그인' : '회원가입'} />
-      </div>
-      {googleLoginStatus ? (
-        <div className="w-full h-10 bg-green-600 text-white py-2 rounded-md flex items-center justify-center mt-4">
-          <CheckIcon aria-hidden="true" className="h-5 w-5 flex-none bg-white-10" /> 구글 로그인에 성공 했습니다
-        </div>
-      ) : (
-        <GoogleLogin setGoogleUserData={setGoogleUserData} setView={setIsLogin} setGoogleLoginStatus={setGoogleLoginStatus} userType={userType} setShowForm={() => setIsLogin(false)} />
-      )}
+      <button
+        type="submit"
+        className="mt-4 transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w/full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
+        style={{ background: '#7F7FD5' }}
+      >
+        <span className="inline-block mr-2">회원가입</span>
+      </button>
+      <button
+        type="button"
+        className="absolute top-1 right-4 text-gray-500 hover:text-gray-700"
+        onClick={() => setIsLogin(true)}
+      >
+        <ArrowUturnLeftIcon className="h-6 w-6" />
+      </button>
     </form>
   );
 }

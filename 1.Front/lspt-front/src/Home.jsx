@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -20,6 +18,8 @@ export default function Example() {
   const [fadeIn, setFadeIn] = useState(true)
   const images = [metaverseImg, fitbitImg, ex3]
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     const interval = setInterval(() => {
       setFadeIn(false)
@@ -36,6 +36,13 @@ export default function Example() {
     return () => clearInterval(interval)
   }, [])
 
+  const handleNavigate = () => {
+    setFadeIn(false)
+    setTimeout(() => {
+      navigate('/login')  // 페이지 전환 전 애니메이션 시간 (1s)
+    }, 1000)
+  }
+
   const renderContent = () => {
     switch(currentImage) {
       case metaverseImg:
@@ -49,13 +56,13 @@ export default function Example() {
               메타버스에서 구현된 여러 기능을 동적으로 경험하세요
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-              <Link
-                to="/login"
+              <button
+                onClick={handleNavigate}
                 className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
               >
                 Get started
-              </Link>
+              </button>
               <Link to="/features" className="text-sm font-semibold leading-6 text-black">
                 Learn more <span aria-hidden="true">→</span>
               </Link>
@@ -73,13 +80,13 @@ export default function Example() {
               자신의 신체정보를 다른사람과 공유하세요
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-              <Link
-                to="/login"
+              <button
+                onClick={handleNavigate}
                 className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
               >
                 Get started
-              </Link>
+              </button>
               <Link to="/features" className="text-sm font-semibold leading-6 text-black">
                 Learn more <span aria-hidden="true">→</span>
               </Link>
@@ -94,19 +101,18 @@ export default function Example() {
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
               신체정보를 기반으로 한 건강 상담 서비스를 진행하세요<br/>
-              
             </p>
             <p className="mt-4 text-lg text-gray-600">
               할머니를 부탁해에서 제공하는 메타버스 서비스 사진입니다.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-              <Link
-                to="/login"
+              <button
+                onClick={handleNavigate}
                 className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
               >
                 Get started
-              </Link>
+              </button>
               <Link to="/features" className="text-sm font-semibold leading-6 text-black">
                 Learn more <span aria-hidden="true">→</span>
               </Link>
@@ -119,7 +125,7 @@ export default function Example() {
   }
 
   return (
-    <div className="h-screen flex justify-center items-center">
+    <div className="h-screen">
       <header className="absolute inset-x-0 top-0 z-50">
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           <div className="flex lg:flex-1">
@@ -195,8 +201,8 @@ export default function Example() {
         </Dialog>
       </header>
 
-      <div className="relative flex flex-col lg:flex-row justify-center items-center h-full w-full min-w-[1300px]">
-        <div className={`w-full lg:w-1/2 bg-white min-h-[872px] flex justify-center items-center ${fadeIn ? 'animate-fadeIn' : 'animate-fadeOut'}`}>
+      <div className={`relative flex flex-col lg:flex-row justify-center items-center h-full w-full min-w-[1300px] transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex justify-center items-center">
           <div className="relative isolate px-6 pt-14 lg:px-8">
             <div
               aria-hidden="true"
@@ -228,7 +234,7 @@ export default function Example() {
           </div>
         </div>
         
-        <div className={`w-full lg:w-1/2 bg-white min-h-[872px] flex flex-col items-center ${fadeIn ? 'animate-fadeIn' : 'animate-fadeOut'}`}>
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex flex-col items-center">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl p-6">실제 사진</h2>
           <div className="p-8">
             <img src={currentImage} alt="메타버스 서비스" className="mt-4" />
@@ -238,4 +244,3 @@ export default function Example() {
     </div>
   )
 }
-
