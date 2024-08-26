@@ -1,31 +1,138 @@
-'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
+import metaverseImg from './assets/metaverse.png'
+import fitbitImg from './assets/fitbit.jpg'
+import ex3 from './assets/ex3.png'
 
 const navigation = [
-  { name: 'Home', href: '/home' },
+  { name: 'Home', href: '/' },
   { name: 'Features', href: '/features' },
 ]
 
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [currentImage, setCurrentImage] = useState(metaverseImg)
+  const [fadeIn, setFadeIn] = useState(true)
+  const images = [metaverseImg, fitbitImg, ex3]
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFadeIn(false)
+      setTimeout(() => {
+        setCurrentImage(prevImage => {
+          const currentIndex = images.indexOf(prevImage)
+          const nextIndex = (currentIndex + 1) % images.length
+          return images[nextIndex]
+        })
+        setFadeIn(true)
+      }, 1000) // Transition duration (1s)
+    }, 8000) // Interval between image changes (8s)
+    
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleNavigate = () => {
+    setFadeIn(false)
+    setTimeout(() => {
+      navigate('/login')  // 페이지 전환 전 애니메이션 시간 (1s)
+    }, 1000)
+  }
+
+  const renderContent = () => {
+    switch(currentImage) {
+      case metaverseImg:
+        return (
+          <>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+              메타버스를 통한<br/>실시간 소통
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              메타버스를 통해 다른 사용자와 실시간으로 소통하세요<br/>
+              메타버스에서 구현된 여러 기능을 동적으로 경험하세요
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+              <button
+                onClick={handleNavigate}
+                className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
+              >
+                Get started
+              </button>
+              <Link to="/features" className="text-sm font-semibold leading-6 text-black">
+                Learn more <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </>
+        )
+      case fitbitImg:
+        return (
+          <>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+              IoT기기를 활용한<br/>신체정보 수집
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              fitbit Sense2를 통해 신체정보를 수집하세요<br/>
+              자신의 신체정보를 다른사람과 공유하세요
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+              <button
+                onClick={handleNavigate}
+                className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
+              >
+                Get started
+              </button>
+              <Link to="/features" className="text-sm font-semibold leading-6 text-black">
+                Learn more <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </>
+        )
+      case ex3:
+        return (
+          <>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+              AI를 통한<br/>건강 상담 서비스
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              신체정보를 기반으로 한 건강 상담 서비스를 진행하세요<br/>
+            </p>
+            <p className="mt-4 text-lg text-gray-600">
+              할머니를 부탁해에서 제공하는 메타버스 서비스 사진입니다.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+              <button
+                onClick={handleNavigate}
+                className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
+              >
+                Get started
+              </button>
+              <Link to="/features" className="text-sm font-semibold leading-6 text-black">
+                Learn more <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </>
+        )
+      default:
+        return null
+    }
+  }
 
   return (
-    <div className="bg-gray-100 h-screen/2">
+    <div className="h-screen">
       <header className="absolute inset-x-0 top-0 z-50">
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           <div className="flex lg:flex-1">
-            <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
-              <img
-                alt=""
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                className="h-8 w-auto"
-              />
-            </a>
+            <Link to="/" className="-m-1.5 p-1.5">
+              <span className="sr-only">#LSPT</span>
+              <span className="text-2xl font-bold text-white">#LSPT</span>
+            </Link>
           </div>
           <div className="flex lg:hidden">
             <button
@@ -37,7 +144,7 @@ export default function Example() {
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
             </button>
           </div>
-          <div className="hidden lg:flex lg:gap-x-12">
+          <div className="hidden lg:flex lg:gap-x-12">  
             {navigation.map((item) => (
               <Link key={item.name} to={item.href} className="text-sm font-semibold leading-6 text-white">
                 {item.name}
@@ -54,14 +161,10 @@ export default function Example() {
           <div className="fixed inset-0 z-50" />
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
-              <a href="#" className="-m-1.5 p-1.5">
-                <span className="sr-only">Your Company</span>
-                <img
-                  alt=""
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                  className="h-8 w-auto"
-                />
-              </a>
+              <Link to="/" className="-m-1.5 p-1.5">
+                <span className="sr-only">#LSPT</span>
+                <span className="text-2xl font-bold text-indigo-600">#LSPT</span>
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
@@ -89,7 +192,7 @@ export default function Example() {
                     to="/login"
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
-                    Log in
+                    Login
                   </Link>
                 </div>
               </div>
@@ -98,8 +201,8 @@ export default function Example() {
         </Dialog>
       </header>
 
-      <div className="relative flex justify-center items-center h-full">
-        <div className="w-1/2 bg-white flex justify-center items-center">
+      <div className={`relative flex flex-col lg:flex-row justify-center items-center h-full w-full min-w-[1300px] transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex justify-center items-center">
           <div className="relative isolate px-6 pt-14 lg:px-8">
             <div
               aria-hidden="true"
@@ -110,31 +213,11 @@ export default function Example() {
                   clipPath:
                     'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
                 }}
-                className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-              />
-            </div>
-            <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                  메타버스를 통한 실시간 소통
-                </h1>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
-                  메타버스를 통해 다른 사용자와 실시간으로 소통하세요<br/>
-                  메타버스에서 구현된 여러 기능을 동적으로 경험하세요
-                  
-                </p>
-                <div className="mt-10 flex items-center justify-center gap-x-6">
-                  <Link
-                    to="/login"
-                    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    Get started
-                  </Link>
-                  <Link to="/features" className="text-sm font-semibold leading-6 text-gray-900">
-                    Learn more <span aria-hidden="true">→</span>
-                  </Link>
-                </div>
+                className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]">
               </div>
+            </div>
+            <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 text-center">
+              {renderContent()}
             </div>
             <div
               aria-hidden="true"
@@ -150,14 +233,11 @@ export default function Example() {
             </div>
           </div>
         </div>
-        <div className="w-1/2 bg-white h-1/2 flex justify-center items-center">
-          
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900">실제 사진</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              할머니를 부탁해에서 제공하는 메타버스 서비스 사진입니다.
-            </p>
-            <img src='assets/ex1.png'></img>
+        
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex flex-col items-center">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl p-6">실제 사진</h2>
+          <div className="p-8">
+            <img src={currentImage} alt="메타버스 서비스" className="mt-4" />
           </div>
         </div>
       </div>
