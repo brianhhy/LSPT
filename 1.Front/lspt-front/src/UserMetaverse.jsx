@@ -4,6 +4,7 @@ import logo from './assets/smalllogo.png';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './UserMetaverse.css';
+import Metaverse from './Metaverse';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageIcon from '@mui/icons-material/ManageAccounts';
@@ -257,9 +258,13 @@ function UserMetaverse() {
               <p className="text-sm"><strong>성별 : </strong> {gender}</p>
               <p className="text-sm"><strong>평균 걸음 : </strong> {averageDailySteps}</p>
             </div>
-
+            
             <li className="hover:bg-gray-100 rounded-lg">
-              <a href="#" className="flex items-center gap-2 px-4 py-2 text-gray-700" onClick={() => setShowDatePicker(!showDatePicker)}>
+              <a
+                href="#"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+              >
                 <CalendarIcon className="size-5 opacity-75" />
                 <span className="text-sm font-medium">지난 신체정보</span>
               </a>
@@ -276,7 +281,11 @@ function UserMetaverse() {
                     placeholderText="Select a date"
                     className="w-36 p-2 border border-gray-300 rounded focus:outline-none text-xs"
                   />
-                  <button onClick={handleSearchClick} className="absolute right-0 p-2 bg-blue-500 text-white rounded-r whitespace-nowrap" style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                  <button
+                    onClick={handleSearchClick}
+                    className="absolute right-0 p-2 bg-blue-500 text-white rounded-r whitespace-nowrap"
+                    style={{ paddingLeft: '8px', paddingRight: '8px' }}
+                  >
                     검색
                   </button>
                 </div>
@@ -352,10 +361,15 @@ function UserMetaverse() {
             </ul>
         </div>
 
-        <div className="flex-1 flex flex-col mt-4 max-h-[600px] justify-center items-center">
+        <div className="flex-1 flex flex-col mt-4 max-h-[600px]">
           {selectedFriend ? (
             <>
-              <h2 className="text-xl font-bold mb-4">{selectedFriend}</h2> {/* 클릭된 친구의 이름 표시 */}
+              {/* 제목을 가운데 정렬 */}
+              <div className="flex justify-center mb-4">
+                <h2 className="text-xl font-bold">{selectedFriend}</h2>
+              </div>
+
+              {/* 메시지 목록 */}
               <div className="overflow-y-auto flex-1 mb-4 flex flex-col max-h-full">
                 {messages.map((message, index) => (
                   <div
@@ -368,7 +382,9 @@ function UserMetaverse() {
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-              <div className="flex">
+
+              {/* 메시지 입력 */}
+              <div className="flex w-full">
                 <input
                   type="text"
                   placeholder="메시지를 입력하세요"
@@ -388,16 +404,19 @@ function UserMetaverse() {
             </>
           ) : (
             <>
-              <img src={logo} alt="Logo" style={{ width: '100px', height: '144px' }} />
-              <h3 className="text-black text-l mt-8">접속중인 친구와 채팅을 시작해주세요!</h3>
+              <div className="flex justify-center">
+                <img src={logo} alt="Logo" style={{ width: '100px', height: '144px' }} />
+              </div>
+              <h3 className="text-black text-l mt-8 text-center">접속중인 친구와 채팅을 시작해주세요!</h3>
             </>
           )}
         </div>
+
       </div>
 
-      <div className={`flex-1 flex flex-col items-center justify-center transition-all duration-300 ${leftSidebarOpen || rightSidebarOpen ? 'ml-64 mr-64' : ''}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${leftSidebarOpen ? 'pl-64' : ''} ${rightSidebarOpen ? 'pr-96' : ''}`}>
         {loading ? (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-1 flex-col items-center justify-center">
             <img src={logo} alt="Logo" style={{ width: '100px', height: '144px' }} />
             <div className="progressbar mb-1">
               <span className="loading"></span>
@@ -405,9 +424,16 @@ function UserMetaverse() {
             <h3 className="text-white text-2xl mt-8">로딩중입니다!</h3>
           </div>
         ) : (
-          <h1 className="text-white text-5xl mb-4 fade-in">Metaverse</h1>
+          <div className="flex-1 flex items-center justify-center w-full h-full">
+            <Metaverse />
+          </div>
         )}
       </div>
+
+
+
+
+
     </div>
   );
 }
