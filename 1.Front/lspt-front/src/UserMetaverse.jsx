@@ -16,15 +16,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 function UserMetaverse() {
   // Predefined user data
-  const userData = {
-    nickname: 'hoyeon',
+
+  /*----------------------↓대영 수정-----------------------------*/
+  const [userData, setUserData] = useState({
+    displayName: '',
     memberType: '일반 회원',
-    name: '홍길동',
-    age: 25,
-    weight: '70kg',
-    gender: '남성',
-    averageSteps: '8,000보',
-  };
+    age: '',
+    weight: '',
+    height: '',
+    gender: '',
+    averageDailySteps: '',
+  });
+  /*----------------------↑대영 수정-----------------------------*/
 
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -33,6 +36,34 @@ function UserMetaverse() {
   const [headerText, setHeaderText] = useState('사용자 신체정보');
   const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate();
+
+  /*-----------------------------↓대영수정-----------------------*/
+  // 사용자 데이터 가져오기
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('https://localhost:8443/api/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // 세션 쿠키를 포함하여 요청을 보냅니다.
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data.user); // 받아온 데이터를 상태에 설정
+        } else {
+          console.error('사용자 데이터를 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('API 요청 중 에러 발생:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+/*-----------------------------↑대영수정-----------------------*/
 
   useEffect(() => {
     const showToasts = !localStorage.getItem('acknowledgedToasts');
@@ -143,7 +174,7 @@ function UserMetaverse() {
     navigate('/login'); // Adjust the path to your login component
   };
 
-  const { nickname, memberType, name, age, weight, gender, averageSteps } = userData;
+  const { displayName, memberType, age, weight, gender, averageDailySteps } = userData;
 
   return (
     <div className="min-h-screen flex relative">
@@ -170,17 +201,19 @@ function UserMetaverse() {
               </a>
             </li>
 
+            {/* ----------------------------↓대영 수정--------------------------------------*/}
             {/* User Body Information */}
             <div className="mt-6">
               <h3 className="text-lg font-bold">{headerText}</h3>
-              <p className="text-sm mt-2"><strong>닉네임 : </strong> {nickname}</p>
-              <p className="text-sm"><strong>회원 유형 : </strong> {memberType}</p>
-              <p className="text-sm"><strong>이름 : </strong> {name}</p>
+              <p className="text-sm mt-2"><strong>닉네임 : </strong> {displayName}</p>
+              <p className="text-sm"><strong>회원 유형 : 일반 회원 </strong> {memberType}</p>
               <p className="text-sm"><strong>나이 : </strong> {age}</p>
               <p className="text-sm"><strong>몸무게 : </strong> {weight}</p>
               <p className="text-sm"><strong>성별 : </strong> {gender}</p>
-              <p className="text-sm"><strong>평균 걸음 : </strong> {averageSteps}</p>
+              <p className="text-sm"><strong>평균 걸음 : </strong> {averageDailySteps}</p>
             </div>
+
+            {/* ----------------------------↑대영 수정--------------------------------------*/}
 
             <li className="hover:bg-gray-100 rounded-lg">
               <a
@@ -247,8 +280,9 @@ function UserMetaverse() {
               className="size-10 rounded-full object-cover"
             />
             <div>
-              <p className="text-xs">
-                <strong className="block font-medium">{nickname}</strong>
+              <p className="text-xs"> {/*↓대영 수정*/}
+                <strong className="block font-medium">{displayName}</strong>
+                                      {/*↑대영 수정*/}
                 <span>{memberType}</span>
               </p>
             </div>

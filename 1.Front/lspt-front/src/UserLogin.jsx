@@ -133,6 +133,13 @@ function SelectUserType({ setUserType, setShowPatientInfo }) {
 }
 
 function PatientInfo({ setShowPatientInfo, setUserType }) {
+ /*--------------------------------↓대영수정---------------------------------*/
+  const handleFitbitConnect = () => {
+    window.location.href = 'https://localhost:8443/authorize';
+  };
+
+ /*--------------------------------↑대영수정---------------------------------*/
+
   const navigate = useNavigate(); // Add this line to get the navigate function
 
   return (
@@ -168,7 +175,9 @@ function PatientInfo({ setShowPatientInfo, setUserType }) {
                       <button
                         className="rounded-md px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         style={{ background: '-webkit-linear-gradient(left, #7F7FD5, #86A8E7, #91EAE4)' }}
-                        onClick={() => navigate('/usermetaverse')} // Modify this line to navigate to UserMetaverse
+                        /*---------------------------------↓대영수정---------------------------------------*/
+                        onClick={handleFitbitConnect} // Modify this line to navigate to UserMetaverse
+                        /*---------------------------------↑대영수정---------------------------------------*/
                       >
                         Fitbit 연동하기
                       </button>
