@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const walkAnimSpeed = 1.0;
     const positionThreshold = 0.1; // 목표 위치에 도달했는지 확인하는 임계값
 
-    let collisionBox;  // 충돌 구역 박스
+    let collisionBox;  // 충돌 구역 박스git
     let collisionBox2; // 충돌 구역 박스 2
     let collisionBox3; // 충돌 구역 박스 3
     let isCollisionCheckEnabled = false;  // 충돌 검사 활성화 여부
