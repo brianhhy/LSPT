@@ -35,6 +35,15 @@ function UserMetaverse() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [headerText, setHeaderText] = useState('사용자 신체정보');
   const [loading, setLoading] = useState(true); // Loading state
+  const [showHealthInfo, setShowHealthInfo] = useState(true); // 신체정보 표시 여부 상태
+  /*----------------------↓대영수정---------------------------*/
+  const [activityData, setActivityData] = useState({
+    caloriesOut: 0,
+    totalDistance: 0,
+    steps: 0,
+  }); // 활동 데이터를 저장할 상태 추가
+  /*----------------------↑대영수정---------------------------*/
+
   const navigate = useNavigate();
 
   /*-----------------------------↓대영수정-----------------------*/
@@ -158,16 +167,50 @@ function UserMetaverse() {
     navigate('/aichat', { state: { activeTab } }); // Pass the active tab state
   };
 
-  const handleSearchClick = () => {
+  /*----------------------------↓대영수정--------------------------------------------*/
+  const handleSearchClick = async () => {
     if (selectedDate) {
       const formattedDate = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
-      setHeaderText(`${formattedDate} 신체정보`);
+      setHeaderText(`${formattedDate} 활동 정보`);
+
+      const formattedDateForAPI = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd 형식으로 변환
+      const url = `https://localhost:8443/api/activities?date=${formattedDateForAPI}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const caloriesOut = data.summary.caloriesOut;
+          const steps = data.summary.steps;
+          const totalDistance = data.summary.distances.find((d) => d.activity === 'total').distance;
+
+          setActivityData({
+            caloriesOut,
+            totalDistance,
+            steps,
+          });
+          setShowHealthInfo(false); // 활동 정보 표시로 전환
+        } else {
+          console.error('활동 데이터를 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('API 요청 중 에러 발생:', error);
+      }
     }
   };
+   /*----------------------------↑대영수정--------------------------------------------*/
 
   const handleHealthInfoClick = () => {
     setSelectedDate(new Date()); // Reset to today's date
     setHeaderText('사용자 신체정보'); // Reset the header text
+    setShowHealthInfo(true); // 신체정보로 전환
   };
 
   const handleLogout = () => {
@@ -205,14 +248,23 @@ function UserMetaverse() {
             {/* User Body Information */}
             <div className="mt-6">
               <h3 className="text-lg font-bold">{headerText}</h3>
-              <p className="text-sm mt-2"><strong>닉네임 : </strong> {displayName}</p>
-              <p className="text-sm"><strong>회원 유형 : 일반 회원 </strong> {memberType}</p>
-              <p className="text-sm"><strong>나이 : </strong> {age}</p>
-              <p className="text-sm"><strong>몸무게 : </strong> {weight}</p>
-              <p className="text-sm"><strong>성별 : </strong> {gender}</p>
-              <p className="text-sm"><strong>평균 걸음 : </strong> {averageDailySteps}</p>
+              {showHealthInfo ? (
+                <>
+                  <p className="text-sm mt-2"><strong>닉네임 : </strong> {displayName}</p>
+                  <p className="text-sm"><strong>회원 유형 : 일반 회원 </strong> {memberType}</p>
+                  <p className="text-sm"><strong>나이 : </strong> {age}</p>
+                  <p className="text-sm"><strong>몸무게 : </strong> {weight}</p>
+                  <p className="text-sm"><strong>성별 : </strong> {gender}</p>
+                  <p className="text-sm"><strong>평균 걸음 : </strong> {averageDailySteps}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm"><strong>총 소모 칼로리 : </strong> {activityData.caloriesOut} kcal</p>
+                  <p className="text-sm"><strong>총 거리 : </strong> {activityData.totalDistance} km</p>
+                  <p className="text-sm"><strong>걸음 수 : </strong> {activityData.steps} 걸음</p>
+                </>
+              )}
             </div>
-
             {/* ----------------------------↑대영 수정--------------------------------------*/}
 
             <li className="hover:bg-gray-100 rounded-lg">
@@ -222,7 +274,7 @@ function UserMetaverse() {
                 onClick={() => setShowDatePicker(!showDatePicker)}
               >
                 <CalendarIcon className="size-5 opacity-75" />
-                <span className="text-sm font-medium">지난 신체정보</span>
+                <span className="text-sm font-medium">지난 활동정보</span>
               </a>
 
               {showDatePicker && (
