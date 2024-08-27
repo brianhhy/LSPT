@@ -13,6 +13,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const walkAnimSpeed = 1.0;
     const positionThreshold = 0.1; // 목표 위치에 도달했는지 확인하는 임계값
 
+
+    let npc1; // NPC 캐릭터
+    let npc2;
+    let npc3;
+    let npc4;
+    let doctor;
+
     let collisionBox;  // 충돌 구역 박스git
     let collisionBox2; // 충돌 구역 박스 2
     let collisionBox3; // 충돌 구역 박스 3
@@ -133,6 +140,91 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+
+        // NPC 로드
+        BABYLON.SceneLoader.ImportMesh("", "/assets/", "npc1.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+            npc1 = meshes[0];
+            npc1.position = new BABYLON.Vector3(9.062627378820114, 0.3, 11.011470688388643);  // 위치 설정
+            npc1.scaling = new BABYLON.Vector3(1, 1, 1);   // 스케일 조정
+
+            // rotationQuaternion이 있을 경우 삭제
+            if (npc1.rotationQuaternion) {
+                npc1.rotationQuaternion = null;
+            }
+
+            // NPC가 캐릭터의 생성위치를 쳐다보게 설정
+            npc1.lookAt(new BABYLON.Vector3(15, 0.3, 15));
+
+
+        });
+
+        BABYLON.SceneLoader.ImportMesh("", "/assets/", "npc2.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+            npc2 = meshes[0];
+            npc2.position = new BABYLON.Vector3(17.5,0.3, 10.3);  // 위치 설정
+            npc2.scaling = new BABYLON.Vector3(1, 1, 1);   // 스케일 조정
+
+            // rotationQuaternion이 있을 경우 삭제
+            if (npc2.rotationQuaternion) {
+                npc2.rotationQuaternion = null;
+            }
+
+            // NPC가 현재 쳐다보는 방향의 반대 방향을 쳐다보게 설정 (Y축 회전)
+            npc2.lookAt(new BABYLON.Vector3(15, 0.3, 15));
+
+
+        });
+
+        BABYLON.SceneLoader.ImportMesh("", "/assets/", "npc3.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+            npc3 = meshes[0];
+            npc3.position = new BABYLON.Vector3(12.1,0.3,12.4);  // 위치 설정
+            npc3.scaling = new BABYLON.Vector3(1, 1, 1);   // 스케일 조정
+
+            // rotationQuaternion이 있을 경우 삭제
+            if (npc3.rotationQuaternion) {
+                npc3.rotationQuaternion = null;
+            }
+
+            // NPC가 현재 쳐다보는 방향의 반대 방향을 쳐다보게 설정 (Y축 회전)
+            npc3.lookAt(new BABYLON.Vector3(15, 0.3, 15));
+
+
+        });
+
+        BABYLON.SceneLoader.ImportMesh("", "/assets/", "npc4.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+            npc4 = meshes[0];
+            npc4.position = new BABYLON.Vector3(14.1,0.3,11.4);  // 위치 설정
+            npc4.scaling = new BABYLON.Vector3(1, 1, 1);   // 스케일 조정
+
+            // rotationQuaternion이 있을 경우 삭제
+            if (npc4.rotationQuaternion) {
+                npc4.rotationQuaternion = null;
+            }
+
+            // NPC가 현재 쳐다보는 방향의 반대 방향을 쳐다보게 설정 (Y축 회전)
+            npc4.lookAt(new BABYLON.Vector3(15, 0.3, 15));
+
+
+        });
+
+        BABYLON.SceneLoader.ImportMesh("", "/assets/", "doctor.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+            doctor = meshes[0];
+            doctor.position = new BABYLON.Vector3(17.,0.3, 13.2);  // 위치 설정
+            doctor.scaling = new BABYLON.Vector3(20, 20, 20);   // 스케일 조정
+
+            // rotationQuaternion이 있을 경우 삭제
+            if (doctor.rotationQuaternion) {
+                doctor.rotationQuaternion = null;
+            }
+
+            // NPC가 현재 쳐다보는 방향의 반대 방향을 쳐다보게 설정 (Y축 회전)
+            doctor.lookAt(new BABYLON.Vector3(15, 0.3, 15));
+
+
+        });
+
+
+
+
         return scene;
     };
 
@@ -182,10 +274,10 @@ window.addEventListener('DOMContentLoaded', () => {
             } else {
                 if (!otherPlayers[updateId]) {
                     // 새로운 플레이어 로드
-                    BABYLON.SceneLoader.ImportMesh("", "/assets/", "boy4.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+                    BABYLON.SceneLoader.ImportMesh("", "/assets/", "other.glb", scene, (meshes, particleSystems, skeletons, animationGroups) => {
                         const newPlayer = meshes[0];
                         newPlayer.position = new BABYLON.Vector3(data.position.x, data.position.y, data.position.z);
-                        newPlayer.scaling = new BABYLON.Vector3(1, 1, 1);
+                        newPlayer.scaling = new BABYLON.Vector3(0.8, 0.8, 0.8);
                         const newPlayerSkeleton = skeletons[0];
                         const newWalkAnim = animationGroups.find(animGroup => animGroup.name === "Walking");
                         const newIdleAnim = animationGroups.find(animGroup => animGroup.name === "Idle");
@@ -287,20 +379,20 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkCollision3 = (newPosition) => {
-            if (hasCollided3) {
-                return true; // 이미 충돌이 발생했으면 true 반환하고 더 이상 검사하지 않음
-            }
 
-            if (isCollisionCheckEnabled && player && player.isReady()) {  // 충돌 검사 활성화 여부와 로드 완료 확인
-                if (newPosition && collisionBox3.intersectsPoint(newPosition)) {
-                    console.log("Collision detected with collision box 3!"); // 충돌 시 로그 출력
-                    hasCollided3 = true; // 충돌이 발생했음을 기록
-                    window.location.href = "https://daum.net"; // 링크로 이동
-                    return true; // 충돌 시 true 반환
-                }
+        if (hasCollided3) {
+            return true; // 이미 충돌이 발생했으면 true 반환하고 더 이상 검사하지 않음
+        }
+        if (isCollisionCheckEnabled && player && player.isReady()) {  // 충돌 검사 활성화 여부와 로드 완료 확인
+            if (newPosition && collisionBox3.intersectsPoint(newPosition)) {
+                console.log("Collision detected with collision box 3!"); // 충돌 시 로그 출력
+                hasCollided3 = true; // 충돌이 발생했음을 기록
+                window.location.href = "https://daum.net"; // 링크로 이동
+                return true; // 충돌 시 true 반환
             }
+        }
 
-            return false; // 충돌이 없으면 false 반환
+        return false; // 충돌이 없으면 false 반환
     };
 
     canvas.addEventListener('pointerdown', (event) => {
