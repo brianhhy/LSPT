@@ -21,6 +21,9 @@ function AiChat() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [headerText, setHeaderText] = useState('사용자 신체정보');
   /*------------------------------------------↓대영수정----------------------------------*/
+
+  // 상태 추가: 신체정보를 보여줄지 활동 정보를 보여줄지 결정하는 상태
+  const [showHealthInfo, setShowHealthInfo] = useState(true); // Default: 신체정보 보여주기
   const [userData, setUserData] = useState({
     displayName: '',
     memberType: '일반 회원',
@@ -29,6 +32,12 @@ function AiChat() {
     height: '',
     gender: '',
     averageDailySteps: '',
+  });
+
+  const [activityData, setActivityData] = useState({
+    caloriesOut: 0,
+    totalDistance: 0,
+    steps: 0,
   });
   /*------------------------------------------↑대영수정-----------------------------------*/
   useEffect(() => {
@@ -69,16 +78,56 @@ function AiChat() {
 
   const handleHealthInfoClick = () => {
     setSelectedDate(new Date()); // Reset to today's date
+    /*--------------------------↓대영 수정---------------------------------------*/
+    setShowHealthInfo(true); // 신체정보 모드로 전환
+    /*--------------------------↑대영 수정---------------------------------------*/
     setHeaderText('사용자 신체정보'); // Reset the header text
   };
 
-  const handleSearchClick = () => {
+  /*-------------------------------------↓대영수정-------------------------------------*/
+  const handleSearchClick = async () => {
     if (selectedDate) {
       const formattedDate = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
-      setHeaderText(`${formattedDate} 신체정보`);
+      setHeaderText(`${formattedDate} 활동 정보`);
+  
+      const formattedDateForAPI = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd 형식으로 변환
+      const url = `https://localhost:8443/api/activities?date=${formattedDateForAPI}`;
+  
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+  
+          // 필요한 데이터를 추출
+          const caloriesOut = data.summary.caloriesOut;
+          const steps = data.summary.steps;
+          const totalDistance = data.summary.distances.find((d) => d.activity === 'total').distance;
+  
+          // 상태 업데이트
+          setActivityData({
+            caloriesOut,
+            totalDistance,
+            steps,
+          });
+          setShowHealthInfo(false); // 활동 데이터 모드로 전환
+        } else {
+          console.error('활동 데이터를 가져오는데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('API 요청 중 에러 발생:', error);
+      }
     }
   };
+  
 
+  /*--------------------------------------↑대영수정-------------------------------------*/
   // 클립보드에 사용자 정보를 복사하는 함수
   const copyToClipboard = () => {
     /*---------------------------------↓대영수정---------------------------*/
@@ -139,13 +188,26 @@ function AiChat() {
               style={{ whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }} // 텍스트가 입력창을 벗어나지 않도록 조정
             >
               {/*--------------------------↓대영수정--------------------------------------*/}
-              <h3 className="text-lg font-bold mb-2">사용자 정보</h3>
-              <p className="text-sm"><strong>닉네임:</strong> {displayName}</p>
-              <p className="text-sm"><strong>회원 유형:일반 회원</strong> {memberType}</p>
-              <p className="text-sm"><strong>나이:</strong> {age}</p>
-              <p className="text-sm"><strong>몸무게:</strong> {weight}</p>
-              <p className="text-sm"><strong>성별:</strong> {gender}</p>
-              <p className="text-sm"><strong>평균 걸음:</strong> {averageDailySteps}</p>
+              {showHealthInfo ? (
+                <>
+                  {/* 사용자 신체정보 표시 */}
+                  <h3 className="text-lg font-bold mb-2">{headerText}</h3>
+                  <p className="text-sm"><strong>닉네임:</strong> {displayName}</p>
+                  <p className="text-sm"><strong>회원 유형:일반 회원</strong> {memberType}</p>
+                  <p className="text-sm"><strong>나이:</strong> {age}</p>
+                  <p className="text-sm"><strong>몸무게:</strong> {weight}</p>
+                  <p className="text-sm"><strong>성별:</strong> {gender}</p>
+                  <p className="text-sm"><strong>평균 걸음:</strong> {averageDailySteps}</p>
+                </>
+              ) : (
+                <>
+                  {/* 지난 활동 정보 표시 */}
+                  <h3 className="text-lg font-bold mb-2">{headerText}</h3>
+                  <p className="text-sm"><strong>총 소모 칼로리:</strong> {activityData.caloriesOut} kcal</p>
+                  <p className="text-sm"><strong>총 거리:</strong> {activityData.totalDistance} km</p>
+                  <p className="text-sm"><strong>걸음 수:</strong> {activityData.steps} 걸음</p>
+                </>
+              )}
               {/*--------------------------↑대영수정--------------------------------------*/}
             </div>
 
@@ -156,7 +218,7 @@ function AiChat() {
                 onClick={() => setShowDatePicker(!showDatePicker)}
               >
                 <CalendarIcon className="size-5 opacity-75" />
-                <span className="text-sm font-medium">지난 신체정보</span>
+                <span className="text-sm font-medium">지난 활동정보</span>
               </a>
 
               {showDatePicker && (

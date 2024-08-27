@@ -7,6 +7,9 @@ import { faCode, faClock, faSeedling, faCube, faShapes } from '@fortawesome/free
 import { Link } from 'react-router-dom';
 import jerryGif from './assets/jerry.gif';
 import hhyProfile from './assets/hhy_profile.png';
+import kdyProfile from './assets/kdy_profile.jpg';
+import pjsProfile from './assets/pjs_profile.jpg';
+import yjsProfile from './assets/yjs_profile.jpg';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -233,19 +236,19 @@ export default function Features() {
               title="Back-end"
               name="고대영"
               description="Fitbit Sense2 연동 및 기능 구현"
-              imgSrc="https://via.placeholder.com/50"
+              imgSrc={kdyProfile}
             />
             <ProfileCard
               title="Back-end"
               name="박준서"
               description="메타버스 구현"
-              imgSrc="https://via.placeholder.com/50"
+              imgSrc={pjsProfile}
             />
             <ProfileCard
               title="Back-end"
               name="윤제승"
               description="메타버스 구현"
-              imgSrc="https://via.placeholder.com/50"
+              imgSrc={yjsProfile}
             />
           </div>
         </div>
