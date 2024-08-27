@@ -28,7 +28,8 @@
     "react-spinners": "^0.14.1",
     "react-toastify": "^10.0.5",
     "react-transition-group": "^4.4.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.18.0"
   },
   "scripts": {
     "start": "react-scripts start",
