@@ -1,11 +1,19 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 
 
 
 function Metaverse() {
+
+    const navigate = useNavigate();
     const canvasRef = useRef(null);
+
+        // 특정 탭으로 이동하는 함수
+    const navigateToAiChat = (activeTab) => {
+        navigate('/aichat', { state: { activeTab } });
+    };
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -28,6 +36,8 @@ function Metaverse() {
         let hasCollided = false, hasCollided2 = false, hasCollided3 = false;
 
         const createScene = () => {
+
+
             const scene = new BABYLON.Scene(engine);
 
             // 카메라 생성
@@ -288,7 +298,7 @@ function Metaverse() {
             if (isCollisionCheckEnabled && player && player.isReady()) {
                 if (newPosition && collisionBox.intersectsPoint(newPosition)) {
                     hasCollided = true;
-                    window.location.href = "https://naver.com";
+                    window.location.href = "http://localhost:3000/";
                     return true;
                 }
             }
@@ -301,7 +311,7 @@ function Metaverse() {
             if (isCollisionCheckEnabled && player && player.isReady()) {
                 if (newPosition && collisionBox2.intersectsPoint(newPosition)) {
                     hasCollided2 = true;
-                    window.location.href = "https://google.com";
+                    window.location.href = "http://localhost:3000/aichat#";
                     return true;
                 }
             }
@@ -314,7 +324,8 @@ function Metaverse() {
             if (isCollisionCheckEnabled && player && player.isReady()) {
                 if (newPosition && collisionBox3.intersectsPoint(newPosition)) {
                     hasCollided3 = true;
-                    window.location.href = "https://daum.net";
+                    //window.location.href = "http://localhost:3000/aichat#";
+                    navigateToAiChat('관리자 상담 서비스')
                     return true;
                 }
             }
