@@ -73,6 +73,26 @@ public class FitbitController {
             String accessToken = (String) response.get("access_token");
             session.setAttribute("access_token", accessToken);
 
+            //세션에 사용자 이름 저장
+            // 2. Fitbit API에 GET 요청
+            Map<String, Object> profileResponse = webClient.get()
+                    .uri("https://api.fitbit.com/1/user/-/profile.json") // Fitbit의 사용자 프로필 엔드포인트
+                    .header("Authorization", "Bearer " + accessToken) // 엑세스 토큰을 헤더에 추가
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (profileResponse == null || !profileResponse.containsKey("user")) {
+                redirectAttributes.addFlashAttribute("error", "Failed to retrieve profile information.");
+                return "redirect:/error";
+            }
+
+        // Fitbit API 응답에서 사용자 이름 가져오기
+            Map<String, Object> user = (Map<String, Object>) profileResponse.get("user");
+            String displayName = (String) user.get("displayName");
+            session.setAttribute("displayName", displayName);
+            System.out.println("name: " + displayName);
+
             return "redirect:http://localhost:3000/UserMetaverse";
         } catch (WebClientResponseException e) {
             redirectAttributes.addFlashAttribute("error", "Error during token request: " + e.getResponseBodyAsString());

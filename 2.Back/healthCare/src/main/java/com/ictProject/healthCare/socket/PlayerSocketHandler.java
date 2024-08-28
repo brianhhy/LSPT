@@ -5,12 +5,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
+import java.util.concurrent.*;
 import java.util.Map;
 import java.util.UUID;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 
 public class PlayerSocketHandler extends TextWebSocketHandler {
@@ -18,7 +16,30 @@ public class PlayerSocketHandler extends TextWebSocketHandler {
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, String> sessionToPlayerId = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
 
+
+    public PlayerSocketHandler() {
+        // 메시지를 큐에서 꺼내서 전송하는 스레드 시작
+        Thread senderThread = new Thread(() -> {
+            while (true) {
+                try {
+                    String message = messageQueue.take(); // 큐에서 메시지 꺼내기
+                    for (WebSocketSession wsSession : sessions.values()) {
+                        if (wsSession.isOpen()) {
+                            synchronized (wsSession) {
+                                wsSession.sendMessage(new TextMessage(message));
+                            }
+                        }
+                    }
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace(); // 에러 처리
+                }
+            }
+        });
+        senderThread.setDaemon(true);
+        senderThread.start();
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String playerId = UUID.randomUUID().toString();
@@ -33,11 +54,9 @@ public class PlayerSocketHandler extends TextWebSocketHandler {
         String playerId = sessionToPlayerId.get(session.getId());
         String payload = message.getPayload();
         String updatedMessage = String.format("{\"playerId\":\"%s\",%s", playerId, payload.substring(1));
-        for (WebSocketSession wsSession : sessions.values()) {
-            if (wsSession.isOpen()) {
-                wsSession.sendMessage(new TextMessage(updatedMessage));
-            }
-        }
+
+        // 메시지를 큐에 추가
+        messageQueue.add(updatedMessage);
     }
 
     @Override

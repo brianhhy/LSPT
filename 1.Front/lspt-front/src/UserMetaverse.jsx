@@ -51,28 +51,37 @@ function UserMetaverse() {
   const [ws, setWs] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const [users, setUsers] = useState([]); // 추가된 상태: 현재 웹소켓에 접속한 사용자 목록
 
   useEffect(() => {
-    const websocket = new WebSocket('ws://localhost:8080');
+    const websocket = new WebSocket('wss://localhost:8443/chat'); // WebSocket 주소 수정
     setWs(websocket);
 
+    websocket.onopen = () => {
+      console.log("WebSocket is open now.");
+    };
+
     websocket.onmessage = (event) => {
-      if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = function () {
-          const receivedMessage = JSON.parse(reader.result);
-          setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-        };
-        reader.readAsText(event.data);
+      let receivedMessage;
+      try {
+        receivedMessage = JSON.parse(event.data);
+      } catch (error) {
+        receivedMessage = { sender: 'System', text: event.data };
+      }
+
+      if (receivedMessage.type === 'userList') {
+        setUsers(receivedMessage.users); // 사용자 목록 업데이트
       } else {
-        let receivedMessage;
-        try {
-          receivedMessage = JSON.parse(event.data);
-        } catch (error) {
-          receivedMessage = { sender: 'System', text: event.data };
-        }
         setMessages((prevMessages) => [...prevMessages, receivedMessage]);
       }
+    };
+
+    websocket.onclose = () => {
+      console.log("WebSocket is closed now.");
+    };
+
+    websocket.onerror = (event) => {
+      console.log("WebSocket error observed:", event);
     };
 
     return () => {
@@ -84,6 +93,7 @@ function UserMetaverse() {
     scrollToBottom();
   }, [messages]);
 
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -91,13 +101,15 @@ function UserMetaverse() {
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
       const message = {
-        sender: userData.displayName,
-        text: inputMessage,
+        sender: userData.displayName, // 수정: sender 필드 추가
+        message: inputMessage,
+        recipient: selectedFriend // 1대1 채팅을 위해 수신자 설정
       };
       ws.send(JSON.stringify(message));
       setInputMessage('');
     }
   };
+
 
   const handleFriendClick = (friendName) => {
     setSelectedFriend(friendName); // 친구 이름 설정
@@ -379,65 +391,55 @@ function UserMetaverse() {
           </button>
         </div>
       </div>
-
+      
       {/* Right Sidebar */}
       <div className={`fixed top-0 right-0 h-full w-96 bg-white p-8 shadow-md flex flex-col justify-between transition-transform duration-300 ${rightSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex-1 overflow-y-auto border-b border-gray-200">
-            <div className="flex items-center justify-start mb-4">
-                <GroupIcon className="mr-2" />
-                <h2 className="text-xl font-bold">친구 목록</h2>
-            </div>
-            <ul className="space-y-2">
-                <li
-                  className="py-2 flex items-center gap-2 border-b border-gray-300 shadow-sm cursor-pointer"
-                  onClick={() => handleFriendClick('jaeseung')}
-                >
-                    <img src={userImg} alt="User" className="w-8 h-8 rounded-full" />
-                    <span>jaeseung</span>
-                    <span className="text-green-500 ml-auto">●</span>
-                </li>
-                <li
-                  className="py-2 flex items-center gap-2 border-b border-gray-300 shadow-sm cursor-pointer"
-                  onClick={() => handleFriendClick('junseo')}
-                >
-                    <img src={userImg} alt="User" className="w-8 h-8 rounded-full" />
-                    <span>junseo</span>
-                    <span className="text-gray-400 ml-auto">●</span>
-                </li>
-                <li
-                  className="py-2 flex items-center gap-2 border-b border-gray-300 shadow-sm cursor-pointer"
-                  onClick={() => handleFriendClick('daeyoung')}
-                >
-                    <img src={userImg} alt="User" className="w-8 h-8 rounded-full" />
-                    <span>daeyoung</span>
-                    <span className="text-gray-400 ml-auto">●</span>
-                </li>
-            </ul>
+          <div className="flex items-center justify-start mb-4">
+            <GroupIcon className="mr-2" />
+            <h2 className="text-xl font-bold">친구 목록</h2>
+          </div>
+          <ul className="space-y-2">
+            {users.map((user, index) => (
+              <li
+                key={index}
+                className="py-2 flex items-center gap-2 border-b border-gray-300 shadow-sm cursor-pointer"
+                onClick={() => handleFriendClick(user)}
+              >
+                <img src={userImg} alt="User" className="w-8 h-8 rounded-full" />
+                <span>{user}</span>
+                <span className="text-green-500 ml-auto">●</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="flex-1 flex flex-col mt-4 max-h-[600px]">
           {selectedFriend ? (
             <>
-              {/* 제목을 가운데 정렬 */}
               <div className="flex justify-center mb-4">
                 <h2 className="text-xl font-bold">{selectedFriend}</h2>
               </div>
 
-              {/* 메시지 목록 */}
               <div className="overflow-y-auto flex-1 mb-4 flex flex-col max-h-full">
-                {messages.map((message, index) => (
+              {messages.map((message, index) => (
                   <div
-                    key={index}
-                    className={`p-2 rounded-lg mb-2 max-w-xs break-words ${message.sender === userData.displayName ? 'bg-blue-500 text-white self-end' : 'bg-gray-100 text-gray-700 self-start'}`}
-                    style={{ alignSelf: message.sender === userData.displayName ? 'flex-end' : 'flex-start' }}
+                  key={index}
+                  className={`p-2 rounded-lg mb-2 max-w-xs break-words ${
+                    message.sender === userData.displayName
+                      ? 'bg-blue-500 text-white self-end' // 내가 보낸 메시지
+                      : 'bg-gray-100 text-gray-700 self-start' // 다른 사용자가 보낸 메시지
+                  }`}
+                  style={{
+                    alignSelf: message.sender === userData.displayName ? 'flex-end' : 'flex-start',
+                  }}
                   >
-                    {message.text}
+                    {message.message}
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* 메시지 입력 */}
               <div className="flex w-full">
                 <input
                   type="text"

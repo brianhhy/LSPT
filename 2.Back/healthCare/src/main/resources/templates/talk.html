@@ -40,7 +40,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var username = document.getElementById("username").textContent;
-        var ws = new WebSocket("ws://localhost:8081/chat");
+        var ws = new WebSocket("wss://localhost:8443/chat");
         var messages = document.getElementById("messages");
         var input = document.getElementById("message-input");
         var sendButton = document.getElementById("send-button");
