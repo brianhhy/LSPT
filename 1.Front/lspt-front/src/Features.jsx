@@ -5,11 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faReact, faNodeJs } from '@fortawesome/free-brands-svg-icons';
 import { faCode, faClock, faSeedling, faCube, faShapes } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import jerryGif from './assets/jerry.gif';
-import hhyProfile from './assets/hhy_profile.png';
+import metaverseGif from './assets/metaverse-move.gif';
+import hhyProfile from './assets/hhy_profile.jpg';
 import kdyProfile from './assets/kdy_profile.jpg';
 import pjsProfile from './assets/pjs_profile.jpg';
 import yjsProfile from './assets/yjs_profile.jpg';
+import featureMetaverse from './assets/featureMetaverse.png';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -202,7 +203,7 @@ export default function Features() {
             </div>
             <div className="flex-shrink-0 mt-8 lg:mt-0 lg:ml-8">
               <img 
-                src={jerryGif} 
+                src={metaverseGif} 
                 alt="Jerry Animation" 
                 className="w-96 h-auto object-cover" 
               />

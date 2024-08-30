@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import logo from './assets/smalllogo.png';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import userImg from './assets/user.png';
-
-import WcIcon from '@mui/icons-material/Wc';
-import EcgHeartIcon from '@mui/icons-material/Favorite';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import WarningIcon from '@mui/icons-material/Warning';
+import UserCard from './UserCard';
+import AdminChatBox from './AdminChatBox';
+import userImg from './assets/user.png';
 
 function AdminMetaverse() {
   const [userData, setUserData] = useState({});
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
-  const [showAlert, setShowAlert] = useState(true);  // State to control alert visibility
+  const [showAlert, setShowAlert] = useState(true);
+  const [showChatBox, setShowChatBox] = useState(false);
+  const [chatUser, setChatUser] = useState(''); 
+  const [selectedUserIndex, setSelectedUserIndex] = useState(null); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,7 +69,7 @@ function AdminMetaverse() {
       if (e.key === 'm') {
         toggleLeftSidebar();
       } else if (e.key === 'c') {
-        toggleRightSidebar();
+        toggleChatBox();
       }
     };
 
@@ -88,9 +88,22 @@ function AdminMetaverse() {
     setLeftSidebarOpen((prev) => !prev);
   };
 
-  const toggleRightSidebar = () => {
-    setRightSidebarOpen((prev) => !prev);
+  const toggleChatBox = () => {
+    setShowChatBox((prev) => !prev);
   };
+
+  const handleChatClick = (name, index) => {
+    setChatUser(name);
+    setShowChatBox(true);
+    setSelectedUserIndex(index); 
+  };
+
+  const users = [
+    { name: "황호연", age: 25, gender: "남", heartRate: 130, steps: 1000 },
+    { name: "윤제승", age: 25, gender: "남", heartRate: 110, steps: 1200 },
+    { name: "박준서", age: 25, gender: "남", heartRate: 120, steps: 1200 },
+    { name: "고대영", age: 25, gender: "남", heartRate: 105, steps: 1200 }
+  ];
 
   return (
     <div className="min-h-screen flex relative">
@@ -106,14 +119,6 @@ function AdminMetaverse() {
           </div>
           <div className="px-4 py-6">
             <ul className="mt-6 space-y-1">
-              <li>
-                <a
-                  href="#"
-                  className="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
-                >
-                  환자 정보
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -135,20 +140,12 @@ function AdminMetaverse() {
         </div>
       </div>
 
-      {/* Right Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white p-8 shadow-md flex flex-col justify-center transition-transform duration-300 ${rightSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div>
-          <h2 className="text-2xl mb-4">채팅창 및 바로가기 사이드바</h2>
-        </div>
-      </div>
-
       {/* Alert Message */}
       {showAlert && (
         <div
           role="alert"
-          className="fixed top-4 left-1/2 transform -translate-x-1/2 rounded-xl border border-s-4 border-red-500 bg-red-400 p-4 shadow-lg"
+          className="fixed top-4 left-1/2 transform -translate-x-1/2 rounded-xl border border-s-4 border-red-500 bg-red-400 p-4 shadow-lg mb-8"
+          style={{ zIndex: 1000 }}
         >
           <div className="flex items-start gap-4">
             <span className="text-white">
@@ -185,139 +182,28 @@ function AdminMetaverse() {
       )}
 
       {/* Main Content */}
+      <div className="flex-1 flex flex-wrap justify-center items-start mt-16">
+        {/* User Cards */}
+        {users.map((user, index) => (
+          <UserCard
+            key={index}
+            name={user.name}
+            age={user.age}
+            gender={user.gender}
+            heartRate={user.heartRate}
+            steps={user.steps}
+            onChatClick={() => handleChatClick(user.name, index)}
+          />
+        ))}
+      </div>
+
+      {/* AdminChatBox */}
       <div
-        className={`flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-center justify-center transition-all duration-300 ${leftSidebarOpen || rightSidebarOpen ? 'ml-64 mr-64' : ''}`}
+        className={`fixed top-0 right-0 h-full w-1/3 lg:w-1/4 bg-white shadow-lg p-4 transition-transform duration-300 transform ${
+          showChatBox ? 'translate-x-0' : 'translate-x-full'
+        }`}
       >
-        {/* Styled Card */}
-        <div className="max-w-sm bg-white shadow-xl rounded-xl border border-s-4 border-red-500 text-gray-900">
-          <div className="rounded-t-lg h-32 overflow-hidden">
-            <img className="object-cover object-top w-full" src={userImg} alt="Profile" />
-          </div>
-          <div className="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-            <img className="object-cover object-center h-32" src={userImg} alt="Profile" />
-          </div>
-          <div className="text-center mt-2">
-            <h2 className="font-semibold">황호연</h2>
-            <p className="text-gray-500">25살</p>
-          </div>
-          <ul className="py-4 mt-2 text-gray-700 flex items-center justify-around">
-            <li className="flex flex-col items-center justify-around">
-              <WcIcon className="text-blue-900" />
-              <div>남</div>
-            </li>
-            <li className="flex flex-col items-center justify-between">
-              <EcgHeartIcon className="text-blue-900" />
-              <div className="text-red-500">130</div>
-            </li>
-            <li className="flex flex-col items-center justify-around">
-              <DirectionsRunIcon className="text-blue-900" />
-              <div>1,000보</div>
-            </li>
-          </ul>
-          <div className="p-4 border-t mx-8 mt-2">
-            <button className="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">
-              채팅하기
-            </button>
-          </div>
-        </div>
-
-        {/* Second Card */}
-        <div className="max-w-sm bg-white shadow-xl rounded-lg text-gray-900">
-          <div className="rounded-t-lg h-32 overflow-hidden">
-            <img className="object-cover object-top w-full" src={userImg} alt="Profile" />
-          </div>
-          <div className="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-            <img className="object-cover object-center h-32" src={userImg} alt="Profile" />
-          </div>
-          <div className="text-center mt-2">
-            <h2 className="font-semibold">윤제승</h2>
-            <p className="text-gray-500">25살</p>
-          </div>
-          <ul className="py-4 mt-2 text-gray-700 flex items-center justify-around">
-            <li className="flex flex-col items-center justify-around">
-              <WcIcon className="text-blue-900" />
-              <div>남</div>
-            </li>
-            <li className="flex flex-col items-center justify-between">
-              <EcgHeartIcon className="text-blue-900" />
-              <div className="text-gray-500">110</div>
-            </li>
-            <li className="flex flex-col items-center justify-around">
-              <DirectionsRunIcon className="text-blue-900" />
-              <div>1,200보</div>
-            </li>
-          </ul>
-          <div className="p-4 border-t mx-8 mt-2">
-            <button className="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">
-              채팅하기
-            </button>
-          </div>
-        </div>
-
-        {/* Additional Cards */}
-        <div className="max-w-sm bg-white shadow-xl rounded-lg text-gray-900">
-          <div className="rounded-t-lg h-32 overflow-hidden">
-            <img className="object-cover object-top w-full" src={userImg} alt="Profile" />
-          </div>
-          <div className="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-            <img className="object-cover object-center h-32" src={userImg} alt="Profile" />
-          </div>
-          <div className="text-center mt-2">
-            <h2 className="font-semibold">박준서</h2>
-            <p className="text-gray-500">25살</p>
-          </div>
-          <ul className="py-4 mt-2 text-gray-700 flex items-center justify-around">
-            <li className="flex flex-col items-center justify-around">
-              <WcIcon className="text-blue-900" />
-              <div>남</div>
-            </li>
-            <li className="flex flex-col items-center justify-between">
-              <EcgHeartIcon className="text-blue-900" />
-              <div className="text-black">120</div>
-            </li>
-            <li className="flex flex-col items-center justify-around">
-              <DirectionsRunIcon className="text-blue-900" />
-              <div>1,200보</div>
-            </li>
-          </ul>
-          <div className="p-4 border-t mx-8 mt-2">
-            <button className="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">
-              채팅하기
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-sm bg-white shadow-xl rounded-lg text-gray-900">
-          <div className="rounded-t-lg h-32 overflow-hidden">
-            <img className="object-cover object-top w-full" src={userImg} alt="Profile" />
-          </div>
-          <div className="mx-auto w-32 h-32 relative -mt-16 border-4 border-white rounded-full overflow-hidden">
-            <img className="object-cover object-center h-32" src={userImg} alt="Profile" />
-          </div>
-          <div className="text-center mt-2">
-            <h2 className="font-semibold">고대영</h2>
-            <p className="text-gray-500">25살</p>
-          </div>
-          <ul className="py-4 mt-2 text-gray-700 flex items-center justify-around">
-            <li className="flex flex-col items-center justify-around">
-              <WcIcon className="text-blue-900" />
-              <div>남</div>
-            </li>
-            <li className="flex flex-col items-center justify-between">
-              <EcgHeartIcon className="text-blue-900" />
-              <div className="text-gray-500">105</div>
-            </li>
-            <li className="flex flex-col items-center justify-around">
-              <DirectionsRunIcon className="text-blue-900" />
-              <div>1,200보</div>
-            </li>
-          </ul>
-          <div className="p-4 border-t mx-8 mt-2">
-            <button className="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">
-              채팅하기
-            </button>
-          </div>
-        </div>
+        {showChatBox && <AdminChatBox userName={chatUser} />}
       </div>
     </div>
   );

@@ -3,9 +3,9 @@ import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom'
 
-import metaverseImg from './assets/metaverse.png'
+import metaverseImg from './assets/homeMetaverse.png'
 import fitbitImg from './assets/fitbit.jpg'
-import ex3 from './assets/ex3.png'
+import ex3 from './assets/aichat.png'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -101,9 +101,8 @@ export default function Example() {
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
               신체정보를 기반으로 한 건강 상담 서비스를 진행하세요<br/>
-            </p>
-            <p className="mt-4 text-lg text-gray-600">
-              할머니를 부탁해에서 제공하는 메타버스 서비스 사진입니다.
+              기본적인 신체정보뿐만 아니라 심박수, 호흡률 등 <br/>
+              Fibit Sense2에서 받아온 여러 신체정보를 상담에 활용하세요
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
               <button
@@ -202,7 +201,7 @@ export default function Example() {
       </header>
 
       <div className={`relative flex flex-col lg:flex-row justify-center items-center h-full w-full min-w-[1300px] transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex justify-center items-center">
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] max-h-[872px] flex justify-center items-center">
           <div className="relative isolate px-6 pt-14 lg:px-8">
             <div
               aria-hidden="true"
@@ -234,11 +233,15 @@ export default function Example() {
           </div>
         </div>
         
-        <div className="w-full lg:w-1/2 bg-white min-h-[872px] flex flex-col items-center">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl p-6">실제 사진</h2>
-          <div className="p-8">
-            <img src={currentImage} alt="메타버스 서비스" className="mt-4" />
-          </div>
+        <div className="w-full lg:w-1/2 bg-white min-h-[872px] max-h-[872px] flex flex-col items-center">
+        <div className="p-8">
+          <img 
+            src={currentImage} 
+            alt="메타버스 서비스" 
+            className={`max-w-full h-auto ${currentImage === ex3 ? 'mt-10 w-[80%]' : 'mt-20'}`}  // ex3 이미지 크기 및 mt 조절
+          />
+        </div>
+
         </div>
       </div>
     </div>

@@ -225,7 +225,7 @@ function AiChatBox() {
           ></textarea>
           <button
             onClick={handleSend}
-            className="relative inline-flex h-10 w-auto flex-initial cursor-pointer items-center justify-center self-center rounded-md bg-blue-700 px-6 text-center align-middle text-base font-medium text-white outline-none focus:ring-2"
+            className="relative inline-flex h-10 w-auto flex-initial cursor-pointer items-center justify-center self-center rounded-md bg-blue-700 px-6 text-center align-middle text-base font-medium text-white outline-none focus:ring-2 mr-2"
           >
             Send
           </button>
