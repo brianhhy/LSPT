@@ -5,16 +5,16 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WarningIcon from '@mui/icons-material/Warning';
 import UserCard from './UserCard';
-import AdminChatBox from './AdminChatBox';
+import AdminChatBox from './ToAdminFromUser';
 import userImg from './assets/user.png';
 
 function AdminMetaverse() {
   const [userData, setUserData] = useState({});
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
   const [showChatBox, setShowChatBox] = useState(false);
-  const [chatUser, setChatUser] = useState(''); 
-  const [selectedUserIndex, setSelectedUserIndex] = useState(null); 
+  const [chatUser, setChatUser] = useState('');
+  const [selectedUserIndex, setSelectedUserIndex] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,6 +65,15 @@ function AdminMetaverse() {
   }, [navigate]);
 
   useEffect(() => {
+    // 2초 뒤에 showAlert를 true로 설정하여 알림 메시지 표시
+    const timer = setTimeout(() => {
+      setShowAlert(true);
+    }, 2000);
+
+    return () => clearTimeout(timer); // 컴포넌트가 언마운트될 때 타이머를 정리
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'm') {
         toggleLeftSidebar();
@@ -95,7 +104,7 @@ function AdminMetaverse() {
   const handleChatClick = (name, index) => {
     setChatUser(name);
     setShowChatBox(true);
-    setSelectedUserIndex(index); 
+    setSelectedUserIndex(index);
   };
 
   const users = [
@@ -144,7 +153,7 @@ function AdminMetaverse() {
       {showAlert && (
         <div
           role="alert"
-          className="fixed top-4 left-1/2 transform -translate-x-1/2 rounded-xl border border-s-4 border-red-500 bg-red-400 p-4 shadow-lg mb-8"
+          className={`fixed top-4 left-1/2 transform -translate-x-1/2 rounded-xl border border-s-4 border-red-500 bg-red-400 p-4 shadow-lg mb-8 transition-opacity duration-500 ${showAlert ? 'opacity-100' : 'opacity-0'}`}
           style={{ zIndex: 1000 }}
         >
           <div className="flex items-start gap-4">
@@ -162,7 +171,7 @@ function AdminMetaverse() {
 
             <button
               className="text-white transition hover:text-gray-200"
-              onClick={() => setShowAlert(false)}  // Dismiss alert on click
+              onClick={() => setShowAlert(false)}
             >
               <span className="sr-only">Dismiss popup</span>
 
@@ -182,7 +191,7 @@ function AdminMetaverse() {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-wrap justify-center items-start mt-16">
+      <div className="flex-1 grid grid-cols-2 gap-4 p-8">
         {/* User Cards */}
         {users.map((user, index) => (
           <UserCard

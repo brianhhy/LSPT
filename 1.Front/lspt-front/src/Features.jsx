@@ -11,6 +11,8 @@ import kdyProfile from './assets/kdy_profile.jpg';
 import pjsProfile from './assets/pjs_profile.jpg';
 import yjsProfile from './assets/yjs_profile.jpg';
 import featureMetaverse from './assets/featureMetaverse.png';
+import aichat from './assets/aichat.png'
+import userinfo from './assets/userinfo.png'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -366,7 +368,7 @@ export default function Features() {
     >
       <div className="container mx-auto flex px-5 h-full md:flex-row flex-col items-center">
         <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-          <img className="object-cover object-center rounded" alt="hero" src="https://dummyimage.com/720x600" />
+          <img className="object-cover object-center rounded" src={featureMetaverse} />
         </div>
         <div className="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
           <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-white">
@@ -403,8 +405,13 @@ export default function Features() {
             </p>
           </div>
           <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-            <img className="object-cover object-center rounded" alt="hero" src="https://dummyimage.com/720x600" />
+            <img
+              className="object-cover object-center rounded-lg border-4 border-gray-300" // 둥근 테두리와 보더 추가
+              alt="hero"
+              src={userinfo}
+            />
           </div>
+
         </div>
       </section>
 
@@ -416,7 +423,7 @@ export default function Features() {
       >
         <div className="container mx-auto flex px-5 h-full md:flex-row flex-col items-center">
           <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
-            <img className="object-cover object-center rounded" alt="hero" src="https://dummyimage.com/720x600" />
+            <img className="object-cover object-center rounded" src={aichat} />
           </div>
           <div className="lg:flex-grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
             <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-white">

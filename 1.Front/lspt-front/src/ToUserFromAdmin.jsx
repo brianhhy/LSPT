@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-function AdminChatBox() {
+function ToUserFromAdmin() {
   const [messages, setMessages] = useState([
-
+    { id: 1, text: '환자님 괜찮으세요?', sender: 'Admin' },
+    { id: 2, text: '심박수가 평균 이상이라서 연락 드렸습니다.', sender: 'Admin' }
   ]);
 
   const [input, setInput] = useState('');
@@ -58,4 +59,4 @@ function AdminChatBox() {
   );
 }
 
-export default AdminChatBox;
+export default ToUserFromAdmin;

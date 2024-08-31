@@ -11,7 +11,7 @@ import userImg from './assets/user.png';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AiChatBox from './AiChatBox';
-import AdminChatBox from './AdminChatBox';
+import AdminChatBox from './ToUserFromAdmin';
 
 function AiChat() {
   const location = useLocation();
