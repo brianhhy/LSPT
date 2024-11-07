@@ -5,8 +5,7 @@ IOT 기반 기술을 이용하여 환자 상태 정보를 실시간으로 파악
 ---
 
 ## 서비스 구성도(서비스 시나리오)
-
-![서비스 구성도](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/fc1c7d92-0724-4f15-bf65-6671fd2e2b1f/image.png)
+<img src="./3.Images/service1.png">
 
 - **백엔드**
   - 스마트 워치 API를 활용한 사용자 데이터 수집
@@ -22,8 +21,8 @@ IOT 기반 기술을 이용하여 환자 상태 정보를 실시간으로 파악
 ---
 
 ## 서비스 흐름도
+<img src="./3.Images/service2.png">
 
-![서비스 흐름도](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/fd17f4c2-bfe6-4e95-9122-1b8761ee5e47/image.png)
 
 ### 사용자 건강 정보 수집 및 모니터링 흐름
 
@@ -98,32 +97,25 @@ IOT 기반 기술을 이용하여 환자 상태 정보를 실시간으로 파악
 ## 실제 소프트웨어 화면
 
 ### Home 화면
-
-![Home 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/bbee2cd2-a600-49a0-aa89-3d61e4542288/KakaoTalk_20240925_192257821.png)
+<img src="./3.Images/home.png">
 
 ### Features 화면
-
-![Features 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/f0351099-2c29-4ea7-877f-68227f6a877a/KakaoTalk_20240925_192310053.png)
+<img src="./3.Images/features.png">
 
 ### Login 화면
-
-![Login 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/e601cf20-0d2f-4589-b953-cc2b9cb16e9a/KakaoTalk_20240925_192320400.png)
+<img src="./3.Images/login.png">
 
 ### 메타버스 화면
-
-![메타버스 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/76530ca9-4237-44af-a39f-bc2ed5e1b582/KakaoTalk_20240925_192424624.png)
+<img src="./3.Images/metaverse.png">
 
 ### AI 채팅 화면
-
-![AI 채팅 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/b639e95e-5733-4a55-baed-102bd2ad9c94/KakaoTalk_20240925_192458409.png)
+<img src="./3.Images/aichat.png">
 
 ### 관리자 채팅 서비스
-
-![관리자 채팅 서비스](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/88e0630b-cc9b-4531-8daa-454f495b0258/KakaoTalk_20240925_192504885.png)
+<img src="./3.Images/adminchat.png">
 
 ### 관리자 화면
-
-![관리자 화면](https://prod-files-secure.s3.us-west-2.amazonaws.com/e999e7d5-ddb5-48d8-91db-be43426e0c00/877ff753-9f02-483e-a506-183d8ac8e59b/KakaoTalk_20240925_192653269.png)
+<img src="./3.Images/adminmetaverse.png">
 
 ---
 
