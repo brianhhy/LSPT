@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import Features from './Features'
 import UserLogin from './UserLogin';
-import Metaverse from './Metaverse';
+import UserMetaverse from './UserMetaverse';
+import AdminMetaverse from './AdminMetaverse';
+import AiChat from './AiChat';
 import './index.css';
 
 ReactDOM.render(
@@ -14,7 +16,10 @@ ReactDOM.render(
         <Route path="/" element={<Home />} />
         <Route path="/features" element={<Features/>}/>
         <Route path="/login" element={<UserLogin />} />
-        <Route path="/metaverse" element={<Metaverse />} />
+        <Route path="/usermetaverse" element={<UserMetaverse />} />
+        <Route path="/adminmetaverse" element={<AdminMetaverse />} />
+        <Route path="/aichat" element={<AiChat />} />
+        
       </Routes>
     </Router>
   </React.StrictMode>,

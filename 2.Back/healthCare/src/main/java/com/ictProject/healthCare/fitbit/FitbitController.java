@@ -3,6 +3,8 @@ package com.ictProject.healthCare.fitbit;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 
@@ -69,7 +72,28 @@ public class FitbitController {
 
             String accessToken = (String) response.get("access_token");
             session.setAttribute("access_token", accessToken);
-            return "redirect:/api/profile";
+
+            //세션에 사용자 이름 저장
+            // 2. Fitbit API에 GET 요청
+            Map<String, Object> profileResponse = webClient.get()
+                    .uri("https://api.fitbit.com/1/user/-/profile.json") // Fitbit의 사용자 프로필 엔드포인트
+                    .header("Authorization", "Bearer " + accessToken) // 엑세스 토큰을 헤더에 추가
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (profileResponse == null || !profileResponse.containsKey("user")) {
+                redirectAttributes.addFlashAttribute("error", "Failed to retrieve profile information.");
+                return "redirect:/error";
+            }
+
+        // Fitbit API 응답에서 사용자 이름 가져오기
+            Map<String, Object> user = (Map<String, Object>) profileResponse.get("user");
+            String displayName = (String) user.get("displayName");
+            session.setAttribute("displayName", displayName);
+            System.out.println("name: " + displayName);
+
+            return "redirect:http://localhost:3000/UserMetaverse";
         } catch (WebClientResponseException e) {
             redirectAttributes.addFlashAttribute("error", "Error during token request: " + e.getResponseBodyAsString());
             return "redirect:/error";
@@ -99,7 +123,7 @@ public class FitbitController {
         String accessToken = (String) session.getAttribute("access_token");
         // 이미 엑세스 토큰이 있는 경우 리다이렉트 방지
         if (accessToken != null) {
-            return "redirect:/api/profile";
+            return "redirect:http://localhost:3000/UserMetaverse";
         }
         session.setAttribute("code_verifier", codeVerifier);
 
